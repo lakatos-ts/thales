@@ -9,6 +9,12 @@ export class Point {
     if (!Number.isFinite(x) || !Number.isFinite(y)) {
       throw new RangeError("coordinates must be finite");
     }
+    if (Object.is(x, -0)) {
+      x = 0;
+    }
+    if (Object.is(y, -0)) {
+      y = 0;
+    }
     this.x = x;
     this.y = y;
   }
