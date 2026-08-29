@@ -1,9 +1,7 @@
--- The grind rung's own budget exhaustion. One more guard than the
--- constructor `class-binder-plain.lean` proves through, which is enough to
--- put the obligation past the default budget: the inversion branches once
--- per guard, and grind runs on every leaf. The obligation is provable — a
--- wide enough budget closes it — so the annotation reports the budget it
--- ran out of rather than the goal it was left holding.
+-- The grind rung's own starvation, under a budget wide enough for
+-- normalization but not for the leaves: the symbolic rungs split it, the
+-- grind half starves, and starvation must report as the annotation's
+-- Timeout rather than a residual-goal GaveUp.
 import ThalesDsl
 
 open Js ThalesDsl
@@ -44,6 +42,8 @@ def TsModel.Wide.distance (self : TsModel.Wide) (q : TsModel.Wide) :
   let dx : JsNumber := TsModel.Wide.x self - TsModel.Wide.x q
   let dy : JsNumber := TsModel.Wide.y self - TsModel.Wide.y q
   return Float.sqrt (dx * dx + dy * dy)
+
+set_option thales.heartbeats 40000
 
 #thales_prove "timeout-grind.ts" "Wide#distance" "nonNegative" :=
   ∀ («p.w» : JsNumber), ∀ («p.x» : JsNumber), ∀ («p.y» : JsNumber),
