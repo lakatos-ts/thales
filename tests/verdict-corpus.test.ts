@@ -6,7 +6,7 @@ import {
   runForEnvelope,
   useRepoScratchDir,
 } from "./helpers/cli.js";
-import { shardOf } from "../engines/thales/scripts/shard.js";
+import { shardOf } from "../scripts/shard.js";
 
 // Needs the Lean toolchain and is minutes-slow, so it only runs when asked:
 // thales.yml sets the variable; unit and coverage runs stay identical
@@ -14,13 +14,7 @@ import { shardOf } from "../engines/thales/scripts/shard.js";
 const enabled = process.env.LAKATOS_PROVE_E2E === "1";
 
 const repoRoot = process.cwd();
-const corpusRoot = path.join(
-  repoRoot,
-  "engines",
-  "thales",
-  "tests",
-  "conformance",
-);
+const corpusRoot = path.join(repoRoot, "thales", "tests", "conformance");
 
 // Bucket name → the status every annotation in that bucket must receive.
 // This table is also the complete list of known buckets, so a stray
@@ -42,6 +36,8 @@ function corpusFixtures(): string[] {
   const fixtures: string[] = [];
   for (const dirent of fs.readdirSync(corpusRoot, { withFileTypes: true })) {
     if (!dirent.isDirectory()) continue; // the README sits beside the buckets
+    // A run from inside the corpus leaves its .lakatos/ here.
+    if (dirent.name.startsWith(".")) continue;
     const bucket = dirent.name;
     if (BUCKET_STATUS[bucket] === undefined) {
       throw new Error(`unknown corpus bucket: ${bucket}`);
@@ -150,7 +146,7 @@ describe.runIf(enabled)("verdict corpus", () => {
       // These fixtures are graded at the default budget; only the timeout
       // bucket reduces it.
       vi.stubEnv("LAKATOS_PROVE_HEARTBEATS", undefined);
-      const env = await runForEnvelope(["prove", ...shardedMain], mainExitCode);
+      const env = await runForEnvelope([...shardedMain], mainExitCode);
 
       // Completeness: every fixture contributes at least one annotation.
       const covered = new Set(env.annotations.map((a) => a.file));
@@ -190,7 +186,7 @@ describe.runIf(enabled)("verdict corpus", () => {
       // The reduced budget is what makes Timeout deterministic: the
       // fixtures are ordinary annotations, not CI-grinding pathologies.
       vi.stubEnv("LAKATOS_PROVE_HEARTBEATS", "1");
-      const env = await runForEnvelope(["prove", ...timeoutFixtures], 0);
+      const env = await runForEnvelope([...timeoutFixtures], 0);
       const covered = new Set(env.annotations.map((a) => a.file));
       expect(timeoutFixtures.filter((f) => !covered.has(f))).toEqual([]);
       for (const a of env.annotations) {

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import * as fs from "node:fs";
 import { runMain, useTempProject } from "./helpers/cli.js";
 import { expectValidEnvelope } from "./helpers/envelope-schema.js";
-import { runEmission } from "../engines/thales/frontend/src/run.js";
+import { runEmission } from "../frontend/src/run.js";
 import { RUN_ROOT } from "@lakatos/core/run-dir";
 
 // An interrupted run still honors the output contract: one schema-valid
@@ -10,7 +10,7 @@ import { RUN_ROOT } from "@lakatos/core/run-dir";
 // reports User, and the documented exit 2. The prover is mocked at the
 // module seam cli-prove uses, so no signal is sent here; pabst's
 // interrupt-e2e.test.ts covers the real thing.
-vi.mock("../engines/thales/frontend/src/run.js", () => ({
+vi.mock("../frontend/src/run.js", () => ({
   runEmission: vi.fn(),
   findEngineRoot: vi.fn(),
 }));
@@ -50,7 +50,7 @@ describe("cli on an interrupted run", () => {
       process.kill(process.pid, "SIGTERM");
       return { kind: "failed", stdout: "", stderr: "" };
     });
-    const { code, stdout, stderr } = await runMain(["prove", "annotated.ts"]);
+    const { code, stdout, stderr } = await runMain(["annotated.ts"]);
     expect(code).toBe(2);
     const env = JSON.parse(stdout[0]!);
     expectValidEnvelope(env);
@@ -58,13 +58,13 @@ describe("cli on an interrupted run", () => {
       env.annotations.every((a: { szs: string }) => a.szs === "User"),
     ).toBe(true);
     expect(stderr).toContain(
-      "lakatos: interrupted by SIGTERM; reporting 2 annotations as User",
+      "thales: interrupted by SIGTERM; reporting 2 annotations as User",
     );
   });
 
   it("prove: the same contract through the Lean runner", async () => {
     runEmissionMock.mockReturnValue({ kind: "interrupted", signal: "SIGINT" });
-    const { code, stdout, stderr } = await runMain(["prove", "annotated.ts"]);
+    const { code, stdout, stderr } = await runMain(["annotated.ts"]);
     expect(code).toBe(2);
     expect(stdout).toHaveLength(1);
     const env = JSON.parse(stdout[0]!);
@@ -73,7 +73,7 @@ describe("cli on an interrupted run", () => {
       env.annotations.every((a: { szs: string }) => a.szs === "User"),
     ).toBe(true);
     expect(stderr).toContain(
-      "lakatos: interrupted by SIGINT; reporting 2 annotations as User",
+      "thales: interrupted by SIGINT; reporting 2 annotations as User",
     );
   });
 });
