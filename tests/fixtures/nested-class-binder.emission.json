@@ -1,5 +1,5 @@
 {
-  "file": "thales/tests/fixtures/nested-class-binder.ts",
+  "file": "tests/fixtures/nested-class-binder.ts",
   "declarations": [
     {
       "kind": "class",

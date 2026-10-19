@@ -1,5 +1,5 @@
 {
-  "file": "thales/tests/fixtures/object-is-tagged.ts",
+  "file": "tests/fixtures/object-is-tagged.ts",
   "declarations": [
     {
       "kind": "function",

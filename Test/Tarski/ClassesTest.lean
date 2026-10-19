@@ -7,7 +7,7 @@ private fields, methods, getters and setters, `static`, `extends`, and
 
 The two acceptance cases of #384 open the file: the issue's own example,
 and the three class fixtures `thales` proves `Theorem`s over —
-`thales/tests/fixtures/classes.ts` — transcribed as terms with
+`tests/fixtures/classes.ts` — transcribed as terms with
 one witness per `@ensures`, so `lake build Test` checks the
 fragment those proofs are about without running Node.
 
@@ -79,7 +79,7 @@ private def boxClass : Stmt :=
 
 /-! ## The emitter's class fixtures
 
-`thales/tests/fixtures/classes.ts` stripped of its type
+`tests/fixtures/classes.ts` stripped of its type
 annotations, with each `@ensures` instantiated at one witness. This is
 the fragment the prover's `Theorem`s are about, so the evaluator has to
 agree with them. -/

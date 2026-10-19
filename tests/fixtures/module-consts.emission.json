@@ -1,5 +1,5 @@
 {
-  "file": "thales/tests/fixtures/module-consts.ts",
+  "file": "tests/fixtures/module-consts.ts",
   "declarations": [
     {
       "kind": "constant",

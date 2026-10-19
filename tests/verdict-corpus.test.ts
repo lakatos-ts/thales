@@ -14,7 +14,7 @@ import { shardOf } from "../scripts/shard.js";
 const enabled = process.env.LAKATOS_PROVE_E2E === "1";
 
 const repoRoot = process.cwd();
-const corpusRoot = path.join(repoRoot, "thales", "tests", "conformance");
+const corpusRoot = path.join(repoRoot, "tests", "conformance");
 
 // Bucket name → the status every annotation in that bucket must receive.
 // This table is also the complete list of known buckets, so a stray

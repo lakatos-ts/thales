@@ -1,5 +1,5 @@
 {
-  "file": "thales/tests/conformance/theorem/class-binder-equality-guards.ts",
+  "file": "tests/conformance/theorem/class-binder-equality-guards.ts",
   "declarations": [
     {
       "kind": "class",

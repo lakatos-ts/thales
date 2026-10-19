@@ -22,7 +22,7 @@ def TsModel.add.ast : Tarski.Program :=
 def TsModel.add (a b : JsNumber) : JsM JsNumber := do
   return a + b
 
-#thales_validate "thales/tests/fixtures/tracer.ts" "add" :=
+#thales_validate "tests/fixtures/tracer.ts" "add" :=
   ∀ (a b : JsNumber),
     Tarski.project Tarski.readNumber
         (Tarski.runScript
@@ -53,7 +53,7 @@ def TsModel.wrong (a : JsNumber) : JsM JsNumber := do
 -- The same obligation at one heartbeat: budget exhaustion is a model line
 -- with the budget reason, never an elaboration error.
 set_option thales.validateHeartbeats 1 in
-#thales_validate "thales/tests/fixtures/tracer.ts" "add" :=
+#thales_validate "tests/fixtures/tracer.ts" "add" :=
   ∀ (a b : JsNumber),
     Tarski.project Tarski.readNumber
         (Tarski.runScript

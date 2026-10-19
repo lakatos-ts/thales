@@ -1,5 +1,5 @@
 {
-  "file": "thales/tests/fixtures/operators.ts",
+  "file": "tests/fixtures/operators.ts",
   "declarations": [
     {
       "kind": "function",

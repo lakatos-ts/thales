@@ -1,5 +1,5 @@
 {
-  "file": "thales/tests/conformance/theorem/boolean-classes.ts",
+  "file": "tests/conformance/theorem/boolean-classes.ts",
   "declarations": [
     {
       "kind": "class",

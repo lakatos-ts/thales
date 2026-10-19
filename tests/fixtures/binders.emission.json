@@ -1,5 +1,5 @@
 {
-  "file": "thales/tests/fixtures/binders.ts",
+  "file": "tests/fixtures/binders.ts",
   "declarations": [
     {
       "kind": "function",

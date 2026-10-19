@@ -6,11 +6,11 @@ are where the design record puts them. Running lemma itself is
 
 open Lean Tarski.Lemma
 
-#guard version == "0.2.0"
+#guard version == "0.2.1"
 #guard schemaVersion == 1
-#guard cacheDir "/home/u" == ("/home/u/.cache/lakatos/lemma@0.2.0" : System.FilePath)
+#guard cacheDir "/home/u" == ("/home/u/.cache/lakatos/lemma@0.2.1" : System.FilePath)
 #guard binIn (installedPackage (cacheDir "/h")) ==
-  ("/h/.cache/lakatos/lemma@0.2.0/node_modules/@lakatos/lemma/dist/cli.js" : System.FilePath)
+  ("/h/.cache/lakatos/lemma@0.2.1/node_modules/@lakatos/lemma/dist/cli.js" : System.FilePath)
 
 def programDoc : String :=
   "{\"schemaVersion\":1,\"file\":\"a.ts\",\"gated\":true,\"outcome\":\"program\",\"program\":{\"type\":\"Program\",\"body\":[]},\"annotations\":[{\"function\":\"f\",\"property\":\"p\",\"line\":3,\"outcome\":\"tried\"},{\"function\":\"g\",\"property\":\"q\",\"line\":9,\"outcome\":\"classified\",\"szs\":\"NotTried\",\"kind\":\"unsupported-range\",\"reason\":\"big\"},{\"function\":\"h\",\"property\":\"r\",\"line\":12,\"outcome\":\"refused\",\"cause\":\"typing\",\"error\":\"a.ts:12: no\"}]}"

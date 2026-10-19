@@ -20,11 +20,11 @@ import {
 } from "./harness.js";
 import { shardOf } from "./shard.js";
 
-const CONFORMANCE = "thales/tests/conformance";
+const CONFORMANCE = "tests/conformance";
 
 /** Always checked: the tracer bullet and a frontend-classified refusal. */
 const QUICK_FIXTURES = [
-  "thales/tests/fixtures/tracer.ts",
+  "tests/fixtures/tracer.ts",
   `${CONFORMANCE}/inappropriate/class-binder.ts`,
 ];
 
@@ -32,7 +32,7 @@ const QUICK_FIXTURES = [
  * bodies, int/nat binders, single-atom conclusions. Fixtures with imports
  * or unsupported ranges join the manifest with their own slices. */
 const EXPRESSION_FIXTURES = [
-  "thales/tests/fixtures/operators.ts",
+  "tests/fixtures/operators.ts",
   `${CONFORMANCE}/theorem/add-commutes.ts`,
   `${CONFORMANCE}/theorem/bounded-double.ts`,
   `${CONFORMANCE}/theorem/endpoints.ts`,
@@ -69,7 +69,7 @@ const EXPRESSION_FIXTURES = [
  * fall through — plus the statement-level degradations (loops, a
  * shadowing redeclaration, an uninitialized let). */
 const STATEMENT_FIXTURES = [
-  "thales/tests/fixtures/statements.ts",
+  "tests/fixtures/statements.ts",
   `${CONFORMANCE}/theorem/branch-joined-let.ts`,
   `${CONFORMANCE}/theorem/boolean-local.ts`,
   `${CONFORMANCE}/inappropriate/truthiness-local.ts`,
@@ -87,7 +87,7 @@ const STATEMENT_FIXTURES = [
  * With this slice the manifest covers every shape the emission pipeline
  * reaches. */
 const BINDER_FIXTURES = [
-  "thales/tests/fixtures/binders.ts",
+  "tests/fixtures/binders.ts",
   `${CONFORMANCE}/countersatisfiable/guarded-witness.ts`,
   `${CONFORMANCE}/countersatisfiable/reserved-binder.ts`,
   `${CONFORMANCE}/theorem/guarded-floor.ts`,
@@ -112,7 +112,7 @@ const BINDER_FIXTURES = [
  * whose class is itself built from classes, and fields at a union and at
  * an earlier class, read through the tagged sites and as receivers. */
 const CLASS_FIXTURES = [
-  "thales/tests/fixtures/classes.ts",
+  "tests/fixtures/classes.ts",
   `${CONFORMANCE}/theorem/class-box-roundtrip.ts`,
   `${CONFORMANCE}/theorem/class-getter-on-this.ts`,
   `${CONFORMANCE}/theorem/class-binder-distance.ts`,
@@ -158,7 +158,7 @@ const METHOD_FIXTURES = [
  * an earlier class through a constructor, a free function over a class,
  * the two ways a parameter's type can refuse, and booleans in classes. */
 const PARAM_FIXTURES = [
-  "thales/tests/fixtures/class-params.ts",
+  "tests/fixtures/class-params.ts",
   `${CONFORMANCE}/theorem/class-param-gap.ts`,
   `${CONFORMANCE}/inappropriate/class-param-interface.ts`,
   `${CONFORMANCE}/theorem/boolean-param.ts`,
@@ -169,7 +169,7 @@ const PARAM_FIXTURES = [
  * non-function declarations bind, mixed with healthy annotations in one
  * file. */
 const DEGRADATION_FIXTURES = [
-  "thales/tests/fixtures/degradations.ts",
+  "tests/fixtures/degradations.ts",
   `${CONFORMANCE}/nottried/empty-after-clamp.ts`,
   `${CONFORMANCE}/nottried/half-bounded-int.ts`,
   `${CONFORMANCE}/nottried/huge-range.ts`,
@@ -201,7 +201,7 @@ const IMPORT_FIXTURES = [
  * cross-module constant, and the read of a module binding the model
  * still refuses. */
 const CONST_FIXTURES = [
-  "thales/tests/fixtures/module-consts.ts",
+  "tests/fixtures/module-consts.ts",
   `${CONFORMANCE}/theorem/module-const-scale.ts`,
   `${CONFORMANCE}/theorem/module-const-ladder.ts`,
   `${CONFORMANCE}/theorem/builtin-alias-magnitude.ts`,
@@ -215,7 +215,7 @@ const CONST_FIXTURES = [
  * union-typed locals (#117), the boolean position a union place projects
  * at, and the refusals unions must not loosen. */
 const UNION_FIXTURES = [
-  "thales/tests/fixtures/unions.ts",
+  "tests/fixtures/unions.ts",
   `${CONFORMANCE}/theorem/union-typeof-dispatch.ts`,
   `${CONFORMANCE}/theorem/union-null-flag.ts`,
   `${CONFORMANCE}/theorem/union-local.ts`,
@@ -230,7 +230,7 @@ const UNION_FIXTURES = [
  * arity, the same shape at full arity, the falsity path, and the
  * trailing-order refusal optionals must not loosen. */
 const OPTIONAL_FIXTURES = [
-  "thales/tests/fixtures/optionals.ts",
+  "tests/fixtures/optionals.ts",
   `${CONFORMANCE}/theorem/optional-arity.ts`,
   `${CONFORMANCE}/countersatisfiable/optional-misread.ts`,
 ];
@@ -240,7 +240,7 @@ const OPTIONAL_FIXTURES = [
  * statically cross-tag comparison answers false instead of refusing,
  * plus the string refusal Object.is must keep. */
 const SAMEVALUE_FIXTURES = [
-  "thales/tests/fixtures/object-is-tagged.ts",
+  "tests/fixtures/object-is-tagged.ts",
   `${CONFORMANCE}/theorem/object-is-boolean-reflexive.ts`,
   `${CONFORMANCE}/theorem/object-is-mixed-branch.ts`,
   `${CONFORMANCE}/theorem/object-is-undefined-atom.ts`,

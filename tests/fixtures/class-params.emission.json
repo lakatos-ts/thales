@@ -1,5 +1,5 @@
 {
-  "file": "thales/tests/fixtures/class-params.ts",
+  "file": "tests/fixtures/class-params.ts",
   "declarations": [
     {
       "kind": "class",

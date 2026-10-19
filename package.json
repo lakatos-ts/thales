@@ -1,0 +1,27 @@
+{
+  "name": "thales",
+  "version": "0.0.0",
+  "private": true,
+  "description": "thales's TypeScript suites and check scripts; the product is the Lean package.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:envelopes": "node scripts/check-envelopes.js",
+    "check:verdict-channel": "node scripts/check-verdict-channel.js"
+  },
+  "devDependencies": {
+    "@lakatos/lemma": "0.2.1",
+    "@types/node": "^26.6.4",
+    "ajv": "^8.20.0",
+    "prettier": "3.9.9",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.0"
+  }
+}

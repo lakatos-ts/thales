@@ -1,5 +1,5 @@
 {
-  "file": "thales/tests/fixtures/unions.ts",
+  "file": "tests/fixtures/unions.ts",
   "declarations": [
     {
       "kind": "function",

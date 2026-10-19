@@ -30,14 +30,13 @@ describe.runIf(enabled)("thales end-to-end (tracer)", () => {
 
   useRepoScratchDir(path.join(repoRoot, ".lakatos", "e2e-work"), (dir) => {
     fs.copyFileSync(
-      path.join(repoRoot, "thales", "tests", "fixtures", "tracer.ts"),
+      path.join(repoRoot, "tests", "fixtures", "tracer.ts"),
       path.join(dir, "tracer.ts"),
     );
     // The witness round-trip runs the corpus's false fixtures and then
     // evaluates their functions (imported above) at the extracted witness.
     const cs = path.join(
       repoRoot,
-      "thales",
       "tests",
       "conformance",
       "countersatisfiable",
@@ -49,7 +48,6 @@ describe.runIf(enabled)("thales end-to-end (tracer)", () => {
     fs.copyFileSync(
       path.join(
         repoRoot,
-        "thales",
         "tests",
         "conformance",
         "theorem",
@@ -61,7 +59,6 @@ describe.runIf(enabled)("thales end-to-end (tracer)", () => {
     fs.copyFileSync(
       path.join(
         repoRoot,
-        "thales",
         "tests",
         "conformance",
         "theorem",
@@ -71,20 +68,13 @@ describe.runIf(enabled)("thales end-to-end (tracer)", () => {
     );
     // Guard refutation: the binder's bounds rule out the throwing arms.
     fs.copyFileSync(
-      path.join(
-        repoRoot,
-        "thales",
-        "tests",
-        "conformance",
-        "theorem",
-        "guarded-sqrt.ts",
-      ),
+      path.join(repoRoot, "tests", "conformance", "theorem", "guarded-sqrt.ts"),
       path.join(dir, "guards.ts"),
     );
     // The class-binder flagship (Point#distance non-negativity), pinned at
     // today's honest refusal; class modeling landing flips this to Theorem.
     fs.copyFileSync(
-      path.join(repoRoot, "thales", "tests", "fixtures", "class-binder.ts"),
+      path.join(repoRoot, "tests", "fixtures", "class-binder.ts"),
       path.join(dir, "point.ts"),
     );
   });

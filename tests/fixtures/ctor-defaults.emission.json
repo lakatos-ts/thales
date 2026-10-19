@@ -1,5 +1,5 @@
 {
-  "file": "thales/tests/fixtures/ctor-defaults.ts",
+  "file": "tests/fixtures/ctor-defaults.ts",
   "declarations": [
     {
       "kind": "class",

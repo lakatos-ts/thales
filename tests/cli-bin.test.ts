@@ -19,12 +19,7 @@ describe.runIf(enabled)("the thales binary", () => {
   it(
     "run-artifact prints one artifact's parsed verdict channel",
     async () => {
-      const fixture = path.join(
-        "thales",
-        "tests",
-        "fixtures",
-        "verdict-channel.lean",
-      );
+      const fixture = path.join("tests", "fixtures", "verdict-channel.lean");
       const { code, stdout } = await runMain(["run-artifact", fixture]);
       expect(code).toBe(0);
       const channel = JSON.parse(stdout[0]!);

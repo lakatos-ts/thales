@@ -1,5 +1,5 @@
 {
-  "thales/tests/fixtures/tracer.ts": [
+  "tests/fixtures/tracer.ts": [
     {
       "function": "add",
       "property": "commutes",
@@ -22,7 +22,7 @@
       "reason": "'Counter#bump' could not be modeled: class 'Counter' has no constructor implementation to model"
     }
   ],
-  "thales/tests/conformance/inappropriate/class-binder.ts": [
+  "tests/conformance/inappropriate/class-binder.ts": [
     {
       "function": "scale",
       "property": "scaled",
@@ -30,7 +30,7 @@
       "reason": "class-valued binder 'Box' names a class outside the model: unmapped TypeScript construct 'ReadonlyKeyword' at 2:15"
     }
   ],
-  "thales/tests/fixtures/operators.ts": [
+  "tests/fixtures/operators.ts": [
     {
       "function": "rem7",
       "property": "belowSeven",
@@ -132,7 +132,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/add-commutes.ts": [
+  "tests/conformance/theorem/add-commutes.ts": [
     {
       "function": "add",
       "property": "commutes",
@@ -144,7 +144,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/bounded-double.ts": [
+  "tests/conformance/theorem/bounded-double.ts": [
     {
       "function": "dbl",
       "property": "doubling",
@@ -156,7 +156,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/endpoints.ts": [
+  "tests/conformance/theorem/endpoints.ts": [
     {
       "function": "keep",
       "property": "positive",
@@ -178,7 +178,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/halve-double.ts": [
+  "tests/conformance/theorem/halve-double.ts": [
     {
       "function": "halve",
       "property": "halving",
@@ -190,7 +190,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/mul-associates.ts": [
+  "tests/conformance/theorem/mul-associates.ts": [
     {
       "function": "mul",
       "property": "associates",
@@ -202,7 +202,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/nat-double.ts": [
+  "tests/conformance/theorem/nat-double.ts": [
     {
       "function": "double",
       "property": "growsOrEqual",
@@ -214,7 +214,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/nat-open-below.ts": [
+  "tests/conformance/theorem/nat-open-below.ts": [
     {
       "function": "triple",
       "property": "grows",
@@ -226,7 +226,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/negate-involution.ts": [
+  "tests/conformance/theorem/negate-involution.ts": [
     {
       "function": "negate",
       "property": "involutive",
@@ -248,7 +248,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/remainder.ts": [
+  "tests/conformance/theorem/remainder.ts": [
     {
       "function": "rem",
       "property": "belowDivisor",
@@ -270,7 +270,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/succ-monotone.ts": [
+  "tests/conformance/theorem/succ-monotone.ts": [
     {
       "function": "succ",
       "property": "monotone",
@@ -282,7 +282,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/twice-parity.ts": [
+  "tests/conformance/theorem/twice-parity.ts": [
     {
       "function": "twice",
       "property": "hits",
@@ -304,7 +304,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/unbounded-mul-commutes.ts": [
+  "tests/conformance/theorem/unbounded-mul-commutes.ts": [
     {
       "function": "mul",
       "property": "commutes",
@@ -316,7 +316,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/commutes.ts": [
+  "tests/conformance/countersatisfiable/commutes.ts": [
     {
       "function": "f",
       "property": "commutes",
@@ -332,7 +332,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/off-by-one.ts": [
+  "tests/conformance/countersatisfiable/off-by-one.ts": [
     {
       "function": "bump",
       "property": "unchanged",
@@ -347,7 +347,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/zero-edge.ts": [
+  "tests/conformance/countersatisfiable/zero-edge.ts": [
     {
       "function": "square",
       "property": "positive",
@@ -362,7 +362,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/float-assoc.ts": [
+  "tests/conformance/countersatisfiable/float-assoc.ts": [
     {
       "function": "assoc3",
       "property": "assoc",
@@ -379,7 +379,7 @@
       }
     }
   ],
-  "thales/tests/conformance/gaveup/nonneg-int-range.ts": [
+  "tests/conformance/gaveup/nonneg-int-range.ts": [
     {
       "function": "scale",
       "property": "grows",
@@ -391,7 +391,7 @@
       }
     }
   ],
-  "thales/tests/conformance/gaveup/unbounded-double.ts": [
+  "tests/conformance/gaveup/unbounded-double.ts": [
     {
       "function": "dbl",
       "property": "doubles",
@@ -403,7 +403,7 @@
       }
     }
   ],
-  "thales/tests/conformance/gaveup/unbounded-false.ts": [
+  "tests/conformance/gaveup/unbounded-false.ts": [
     {
       "function": "bump",
       "property": "unchanged",
@@ -415,7 +415,7 @@
       }
     }
   ],
-  "thales/tests/conformance/gaveup/unbounded-nat.ts": [
+  "tests/conformance/gaveup/unbounded-nat.ts": [
     {
       "function": "dbl",
       "property": "grows",
@@ -427,7 +427,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/await-remote.ts": [
+  "tests/conformance/inappropriate/await-remote.ts": [
     {
       "function": "fetchTotal",
       "property": "nonNegative",
@@ -435,7 +435,7 @@
       "reason": "'fetchTotal' could not be modeled: unmapped TypeScript construct 'AsyncKeyword' at 4:8"
     }
   ],
-  "thales/tests/conformance/inappropriate/class-method.ts": [
+  "tests/conformance/inappropriate/class-method.ts": [
     {
       "function": "Counter#bump",
       "property": "bumps",
@@ -443,7 +443,7 @@
       "reason": "'Counter#bump' could not be modeled: class 'Counter' has no constructor implementation to model"
     }
   ],
-  "thales/tests/conformance/inappropriate/exponentiation.ts": [
+  "tests/conformance/inappropriate/exponentiation.ts": [
     {
       "function": "square",
       "property": "nonNegative",
@@ -455,7 +455,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/unmodeled-operator.ts": [
+  "tests/conformance/inappropriate/unmodeled-operator.ts": [
     {
       "function": "masked",
       "property": "stuck",
@@ -467,7 +467,7 @@
       }
     }
   ],
-  "thales/tests/conformance/timeout/big-domain.ts": [
+  "tests/conformance/timeout/big-domain.ts": [
     {
       "function": "sq",
       "property": "nonneg",
@@ -479,7 +479,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/finite-guard.ts": [
+  "tests/conformance/theorem/finite-guard.ts": [
     {
       "function": "scale",
       "property": "nonNeg",
@@ -491,7 +491,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/abs-shrinks.ts": [
+  "tests/conformance/countersatisfiable/abs-shrinks.ts": [
     {
       "function": "mag",
       "property": "grows",
@@ -506,7 +506,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/last-element.ts": [
+  "tests/conformance/countersatisfiable/last-element.ts": [
     {
       "function": "dbl",
       "property": "below",
@@ -521,7 +521,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/fround-exact-wide.ts": [
+  "tests/conformance/theorem/fround-exact-wide.ts": [
     {
       "function": "narrow",
       "property": "exact",
@@ -533,7 +533,7 @@
       }
     }
   ],
-  "thales/tests/fixtures/statements.ts": [
+  "tests/fixtures/statements.ts": [
     {
       "function": "floorAtOne",
       "property": "floorsAtOne",
@@ -565,7 +565,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/branch-joined-let.ts": [
+  "tests/conformance/theorem/branch-joined-let.ts": [
     {
       "function": "floorAtOne",
       "property": "atLeastOne",
@@ -587,7 +587,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/boolean-local.ts": [
+  "tests/conformance/theorem/boolean-local.ts": [
     {
       "function": "clip",
       "property": "named",
@@ -659,7 +659,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/truthiness-local.ts": [
+  "tests/conformance/inappropriate/truthiness-local.ts": [
     {
       "function": "f",
       "property": "p",
@@ -671,7 +671,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/const-chain.ts": [
+  "tests/conformance/theorem/const-chain.ts": [
     {
       "function": "affine",
       "property": "affine",
@@ -683,7 +683,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/let-binding.ts": [
+  "tests/conformance/theorem/let-binding.ts": [
     {
       "function": "shifted",
       "property": "nonNegative",
@@ -695,7 +695,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/branch-throw.ts": [
+  "tests/conformance/countersatisfiable/branch-throw.ts": [
     {
       "function": "reciprocal",
       "property": "positive",
@@ -710,7 +710,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/branch-loop.ts": [
+  "tests/conformance/inappropriate/branch-loop.ts": [
     {
       "function": "countDown",
       "property": "nonNegative",
@@ -718,7 +718,7 @@
       "reason": "'countDown' could not be modeled: unmapped TypeScript construct 'WhileStatement' at 5:5"
     }
   ],
-  "thales/tests/conformance/inappropriate/for-loop.ts": [
+  "tests/conformance/inappropriate/for-loop.ts": [
     {
       "function": "sumTo",
       "property": "nonNegative",
@@ -726,7 +726,7 @@
       "reason": "'sumTo' could not be modeled: unmapped TypeScript construct 'ForStatement' at 4:3"
     }
   ],
-  "thales/tests/conformance/inappropriate/shadowed-const.ts": [
+  "tests/conformance/inappropriate/shadowed-const.ts": [
     {
       "function": "rebound",
       "property": "nonNegative",
@@ -734,7 +734,7 @@
       "reason": "'rebound' could not be modeled: unmapped TypeScript construct 'VariableStatement' at 5:5"
     }
   ],
-  "thales/tests/conformance/inappropriate/uninitialized-let.ts": [
+  "tests/conformance/inappropriate/uninitialized-let.ts": [
     {
       "function": "assigned",
       "property": "nonNegative",
@@ -742,7 +742,7 @@
       "reason": "'assigned' could not be modeled: unmapped TypeScript construct 'VariableStatement' at 3:3"
     }
   ],
-  "thales/tests/fixtures/binders.ts": [
+  "tests/fixtures/binders.ts": [
     {
       "function": "keep",
       "property": "chained",
@@ -790,7 +790,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/guarded-witness.ts": [
+  "tests/conformance/countersatisfiable/guarded-witness.ts": [
     {
       "function": "floorAtOne",
       "property": "aboveThreshold",
@@ -805,7 +805,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/reserved-binder.ts": [
+  "tests/conformance/countersatisfiable/reserved-binder.ts": [
     {
       "function": "double",
       "property": "reachesOne",
@@ -820,7 +820,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/guarded-floor.ts": [
+  "tests/conformance/theorem/guarded-floor.ts": [
     {
       "function": "keep",
       "property": "guardedFloor",
@@ -832,7 +832,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/branch-guarded-throw.ts": [
+  "tests/conformance/theorem/branch-guarded-throw.ts": [
     {
       "function": "reciprocal",
       "property": "positive",
@@ -844,7 +844,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/number-binder.ts": [
+  "tests/conformance/theorem/number-binder.ts": [
     {
       "function": "echo",
       "property": "identity",
@@ -856,7 +856,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/branch-clamp.ts": [
+  "tests/conformance/theorem/branch-clamp.ts": [
     {
       "function": "clamp",
       "property": "nonNegative",
@@ -868,7 +868,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/finite-bounds.ts": [
+  "tests/conformance/theorem/finite-bounds.ts": [
     {
       "function": "scaleBounded",
       "property": "monotone",
@@ -890,7 +890,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/left-factor.ts": [
+  "tests/conformance/theorem/left-factor.ts": [
     {
       "function": "scale",
       "property": "monotone",
@@ -912,7 +912,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/literal-factor.ts": [
+  "tests/conformance/theorem/literal-factor.ts": [
     {
       "function": "cmToInch",
       "property": "monotone",
@@ -934,7 +934,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/guarded-monotone-conversion.ts": [
+  "tests/conformance/theorem/guarded-monotone-conversion.ts": [
     {
       "function": "applyConversionFactors",
       "property": "monotone",
@@ -946,7 +946,7 @@
       }
     }
   ],
-  "thales/tests/conformance/gaveup/scale-identity.ts": [
+  "tests/conformance/gaveup/scale-identity.ts": [
     {
       "function": "scale",
       "property": "fixed",
@@ -958,7 +958,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/guarded-power.ts": [
+  "tests/conformance/inappropriate/guarded-power.ts": [
     {
       "function": "keep",
       "property": "guardedPower",
@@ -966,7 +966,7 @@
       "reason": "'**' is not supported"
     }
   ],
-  "thales/tests/conformance/theorem/or-guard.ts": [
+  "tests/conformance/theorem/or-guard.ts": [
     {
       "function": "double",
       "property": "small",
@@ -998,7 +998,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/or-guard-witness.ts": [
+  "tests/conformance/countersatisfiable/or-guard-witness.ts": [
     {
       "function": "bit",
       "property": "picksOne",
@@ -1013,7 +1013,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/connective-conclusions.ts": [
+  "tests/conformance/theorem/connective-conclusions.ts": [
     {
       "function": "bump",
       "property": "notBig",
@@ -1045,7 +1045,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/boolean-witness.ts": [
+  "tests/conformance/countersatisfiable/boolean-witness.ts": [
     {
       "function": "pick",
       "property": "alwaysPicks",
@@ -1074,7 +1074,7 @@
       }
     }
   ],
-  "thales/tests/fixtures/classes.ts": [
+  "tests/fixtures/classes.ts": [
     {
       "function": "Box#v",
       "property": "roundTrip",
@@ -1116,7 +1116,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/class-box-roundtrip.ts": [
+  "tests/conformance/theorem/class-box-roundtrip.ts": [
     {
       "function": "Box#v",
       "property": "roundTrip",
@@ -1128,7 +1128,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/class-getter-on-this.ts": [
+  "tests/conformance/theorem/class-getter-on-this.ts": [
     {
       "function": "Box#direct",
       "property": "viaThis",
@@ -1170,7 +1170,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/class-binder-distance.ts": [
+  "tests/conformance/theorem/class-binder-distance.ts": [
     {
       "function": "Point#distance",
       "property": "nonNegative",
@@ -1182,7 +1182,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/class-binder-equality-guards.ts": [
+  "tests/conformance/theorem/class-binder-equality-guards.ts": [
     {
       "function": "Point#distance",
       "property": "nonNegative",
@@ -1194,7 +1194,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/class-binder-nested.ts": [
+  "tests/conformance/theorem/class-binder-nested.ts": [
     {
       "function": "Span#length",
       "property": "nonNegative",
@@ -1206,7 +1206,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/class-binder-wide.ts": [
+  "tests/conformance/theorem/class-binder-wide.ts": [
     {
       "function": "Wide#distance",
       "property": "nonNegative",
@@ -1218,7 +1218,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/ctor-assigns-twice.ts": [
+  "tests/conformance/inappropriate/ctor-assigns-twice.ts": [
     {
       "function": "Pair#a",
       "property": "stored",
@@ -1226,7 +1226,7 @@
       "reason": "'Pair#a' could not be modeled: the constructor of 'Pair' assigns field '#a' more than once on a path; the class model requires every field assigned exactly once on every path"
     }
   ],
-  "thales/tests/conformance/inappropriate/ctor-partial-assign.ts": [
+  "tests/conformance/inappropriate/ctor-partial-assign.ts": [
     {
       "function": "Clamp#v",
       "property": "floored",
@@ -1234,7 +1234,7 @@
       "reason": "'Clamp#v' could not be modeled: the constructor of 'Clamp' assigns field '#v' on only some paths; the class model requires every field assigned exactly once on every path"
     }
   ],
-  "thales/tests/conformance/inappropriate/class-extends.ts": [
+  "tests/conformance/inappropriate/class-extends.ts": [
     {
       "function": "Tagged#v",
       "property": "keeps",
@@ -1242,7 +1242,7 @@
       "reason": "'Tagged#v' could not be modeled: unmapped TypeScript construct 'HeritageClause' at 3:21"
     }
   ],
-  "thales/tests/conformance/theorem/ctor-default-omitted.ts": [
+  "tests/conformance/theorem/ctor-default-omitted.ts": [
     {
       "function": "P#span",
       "property": "p",
@@ -1254,7 +1254,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/ctor-default-undefined.ts": [
+  "tests/conformance/theorem/ctor-default-undefined.ts": [
     {
       "function": "g",
       "property": "p",
@@ -1266,7 +1266,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/class-binder-ctor-default.ts": [
+  "tests/conformance/theorem/class-binder-ctor-default.ts": [
     {
       "function": "sum",
       "property": "p",
@@ -1278,7 +1278,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/fn-default-instance.ts": [
+  "tests/conformance/theorem/fn-default-instance.ts": [
     {
       "function": "shift",
       "property": "p",
@@ -1290,7 +1290,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/ctor-default-instance.ts": [
+  "tests/conformance/theorem/ctor-default-instance.ts": [
     {
       "function": "Seg#len",
       "property": "p",
@@ -1302,7 +1302,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/method-default-instance.ts": [
+  "tests/conformance/theorem/method-default-instance.ts": [
     {
       "function": "Pt#plus",
       "property": "p",
@@ -1314,7 +1314,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/class-local.ts": [
+  "tests/conformance/theorem/class-local.ts": [
     {
       "function": "viaLocal",
       "property": "copies",
@@ -1346,7 +1346,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/local-inferred.ts": [
+  "tests/conformance/theorem/local-inferred.ts": [
     {
       "function": "viaLocal",
       "property": "copies",
@@ -1418,7 +1418,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/ctor-default-this.ts": [
+  "tests/conformance/inappropriate/ctor-default-this.ts": [
     {
       "function": "Q#z",
       "property": "p",
@@ -1430,7 +1430,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/method-default-omitted.ts": [
+  "tests/conformance/theorem/method-default-omitted.ts": [
     {
       "function": "C#plus",
       "property": "p",
@@ -1442,7 +1442,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/method-default-this.ts": [
+  "tests/conformance/theorem/method-default-this.ts": [
     {
       "function": "Counter#twice",
       "property": "p",
@@ -1454,7 +1454,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/fn-default-omitted.ts": [
+  "tests/conformance/theorem/fn-default-omitted.ts": [
     {
       "function": "g",
       "property": "p",
@@ -1466,7 +1466,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/fn-default-explicit-undefined.ts": [
+  "tests/conformance/theorem/fn-default-explicit-undefined.ts": [
     {
       "function": "g",
       "property": "p",
@@ -1478,7 +1478,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/fn-default-leading.ts": [
+  "tests/conformance/theorem/fn-default-leading.ts": [
     {
       "function": "g",
       "property": "p",
@@ -1490,7 +1490,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/fn-default-calls.ts": [
+  "tests/conformance/theorem/fn-default-calls.ts": [
     {
       "function": "g",
       "property": "p",
@@ -1502,7 +1502,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/fn-default-outside-slice.ts": [
+  "tests/conformance/theorem/fn-default-outside-slice.ts": [
     {
       "function": "g",
       "property": "p",
@@ -1514,7 +1514,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/field-union-undefined.ts": [
+  "tests/conformance/theorem/field-union-undefined.ts": [
     {
       "function": "Reading#get",
       "property": "readsBack",
@@ -1536,7 +1536,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/field-class-nested.ts": [
+  "tests/conformance/theorem/field-class-nested.ts": [
     {
       "function": "Outer#twice",
       "property": "delegates",
@@ -1548,7 +1548,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/field-later-class.ts": [
+  "tests/conformance/inappropriate/field-later-class.ts": [
     {
       "function": "Holder#peek",
       "property": "peeks",
@@ -1556,7 +1556,7 @@
       "reason": "'Holder#peek' could not be modeled: unmapped TypeScript construct 'TypeReference' at 4:18"
     }
   ],
-  "thales/tests/conformance/theorem/method-double.ts": [
+  "tests/conformance/theorem/method-double.ts": [
     {
       "function": "Box#double",
       "property": "doubled",
@@ -1568,7 +1568,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/method-chain.ts": [
+  "tests/conformance/theorem/method-chain.ts": [
     {
       "function": "Acc#twice",
       "property": "chained",
@@ -1580,7 +1580,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/method-guarded-throw.ts": [
+  "tests/conformance/theorem/method-guarded-throw.ts": [
     {
       "function": "Gate#level",
       "property": "kept",
@@ -1592,7 +1592,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/method-on-shadowing-class.ts": [
+  "tests/conformance/theorem/method-on-shadowing-class.ts": [
     {
       "function": "Math#abs",
       "property": "own",
@@ -1614,7 +1614,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/method-sibling-degrades.ts": [
+  "tests/conformance/theorem/method-sibling-degrades.ts": [
     {
       "function": "Pair#value",
       "property": "kept",
@@ -1626,7 +1626,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/method-power.ts": [
+  "tests/conformance/inappropriate/method-power.ts": [
     {
       "function": "Pow#square",
       "property": "grows",
@@ -1638,7 +1638,7 @@
       }
     }
   ],
-  "thales/tests/fixtures/class-params.ts": [
+  "tests/fixtures/class-params.ts": [
     {
       "function": "Point#gap",
       "property": "selfGap",
@@ -1680,7 +1680,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/class-param-gap.ts": [
+  "tests/conformance/theorem/class-param-gap.ts": [
     {
       "function": "Point#gap",
       "property": "selfGap",
@@ -1692,7 +1692,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/class-param-interface.ts": [
+  "tests/conformance/inappropriate/class-param-interface.ts": [
     {
       "function": "Point#near",
       "property": "p",
@@ -1700,7 +1700,7 @@
       "reason": "'Point#near' could not be modeled: 'Named' could not be modeled: unmapped TypeScript construct 'InterfaceDeclaration' at 1:18"
     }
   ],
-  "thales/tests/conformance/theorem/boolean-param.ts": [
+  "tests/conformance/theorem/boolean-param.ts": [
     {
       "function": "isSmall",
       "property": "small",
@@ -1792,7 +1792,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/boolean-classes.ts": [
+  "tests/conformance/theorem/boolean-classes.ts": [
     {
       "function": "Flag#level",
       "property": "reads",
@@ -1834,7 +1834,7 @@
       }
     }
   ],
-  "thales/tests/fixtures/degradations.ts": [
+  "tests/fixtures/degradations.ts": [
     {
       "function": "twice",
       "property": "doubles",
@@ -1869,7 +1869,7 @@
       "kind": "unsupported-range"
     }
   ],
-  "thales/tests/conformance/nottried/empty-after-clamp.ts": [
+  "tests/conformance/nottried/empty-after-clamp.ts": [
     {
       "function": "vac",
       "property": "vacuous",
@@ -1878,7 +1878,7 @@
       "kind": "unsupported-range"
     }
   ],
-  "thales/tests/conformance/nottried/half-bounded-int.ts": [
+  "tests/conformance/nottried/half-bounded-int.ts": [
     {
       "function": "cap",
       "property": "nonpos",
@@ -1886,7 +1886,7 @@
       "reason": "stub: no structured property provided"
     }
   ],
-  "thales/tests/conformance/nottried/huge-range.ts": [
+  "tests/conformance/nottried/huge-range.ts": [
     {
       "function": "keep",
       "property": "nonneg",
@@ -1895,7 +1895,7 @@
       "kind": "unsupported-range"
     }
   ],
-  "thales/tests/conformance/theorem/residual-untaken-branch.ts": [
+  "tests/conformance/theorem/residual-untaken-branch.ts": [
     {
       "function": "width",
       "property": "one",
@@ -1907,7 +1907,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/residual-dropped-value.ts": [
+  "tests/conformance/inappropriate/residual-dropped-value.ts": [
     {
       "function": "traced",
       "property": "kept",
@@ -1919,7 +1919,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/residual-sites-distinct.ts": [
+  "tests/conformance/inappropriate/residual-sites-distinct.ts": [
     {
       "function": "twice",
       "property": "agree",
@@ -1931,7 +1931,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/custom-throw-unreached.ts": [
+  "tests/conformance/theorem/custom-throw-unreached.ts": [
     {
       "function": "guard",
       "property": "positive",
@@ -1943,7 +1943,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/custom-throw-reached.ts": [
+  "tests/conformance/inappropriate/custom-throw-reached.ts": [
     {
       "function": "guard",
       "property": "positive",
@@ -1955,7 +1955,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/imported-scale/main.ts": [
+  "tests/conformance/theorem/imported-scale/main.ts": [
     {
       "function": "twice",
       "property": "quadruples",
@@ -1967,7 +1967,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/aliased-export/main.ts": [
+  "tests/conformance/theorem/aliased-export/main.ts": [
     {
       "function": "top",
       "property": "positive",
@@ -1979,7 +1979,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/barrel-import/main.ts": [
+  "tests/conformance/theorem/barrel-import/main.ts": [
     {
       "function": "through",
       "property": "affine",
@@ -1991,7 +1991,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/bare-import/main.ts": [
+  "tests/conformance/inappropriate/bare-import/main.ts": [
     {
       "function": "grow",
       "property": "nonNegative",
@@ -2003,7 +2003,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/import-cycle/main.ts": [
+  "tests/conformance/inappropriate/import-cycle/main.ts": [
     {
       "function": "total",
       "property": "nonNegative",
@@ -2015,7 +2015,7 @@
       }
     }
   ],
-  "thales/tests/fixtures/module-consts.ts": [
+  "tests/fixtures/module-consts.ts": [
     {
       "function": "secondsToMilliseconds",
       "property": "nonNegative",
@@ -2087,7 +2087,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/module-const-scale.ts": [
+  "tests/conformance/theorem/module-const-scale.ts": [
     {
       "function": "secondsToMilliseconds",
       "property": "nonNegative",
@@ -2109,7 +2109,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/module-const-ladder.ts": [
+  "tests/conformance/theorem/module-const-ladder.ts": [
     {
       "function": "toMinutes",
       "property": "nonNegative",
@@ -2121,7 +2121,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/builtin-alias-magnitude.ts": [
+  "tests/conformance/theorem/builtin-alias-magnitude.ts": [
     {
       "function": "magnitude",
       "property": "nonNegative",
@@ -2133,7 +2133,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/imported-constants/main.ts": [
+  "tests/conformance/theorem/imported-constants/main.ts": [
     {
       "function": "daysToWeeks",
       "property": "nonNegative",
@@ -2145,7 +2145,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/initializers.ts": [
+  "tests/conformance/theorem/initializers.ts": [
     {
       "function": "diagonal",
       "property": "nonNegative",
@@ -2167,7 +2167,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/const-epsilon-read.ts": [
+  "tests/conformance/theorem/const-epsilon-read.ts": [
     {
       "function": "nudge",
       "property": "nonNegative",
@@ -2179,7 +2179,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/module-let-read.ts": [
+  "tests/conformance/inappropriate/module-let-read.ts": [
     {
       "function": "scale",
       "property": "nonNegative",
@@ -2191,7 +2191,7 @@
       }
     }
   ],
-  "thales/tests/fixtures/unions.ts": [
+  "tests/fixtures/unions.ts": [
     {
       "function": "toNum",
       "property": "numId",
@@ -2243,7 +2243,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/union-typeof-dispatch.ts": [
+  "tests/conformance/theorem/union-typeof-dispatch.ts": [
     {
       "function": "toNum",
       "property": "numId",
@@ -2255,7 +2255,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/union-null-flag.ts": [
+  "tests/conformance/theorem/union-null-flag.ts": [
     {
       "function": "nullFlag",
       "property": "neverNull",
@@ -2267,7 +2267,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/union-local.ts": [
+  "tests/conformance/theorem/union-local.ts": [
     {
       "function": "carry",
       "property": "numId",
@@ -2279,7 +2279,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/boolean-union-place.ts": [
+  "tests/conformance/theorem/boolean-union-place.ts": [
     {
       "function": "Maybe#level",
       "property": "narrowed",
@@ -2311,7 +2311,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/union-misread.ts": [
+  "tests/conformance/countersatisfiable/union-misread.ts": [
     {
       "function": "toNum",
       "property": "misreads",
@@ -2326,7 +2326,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/union-return.ts": [
+  "tests/conformance/inappropriate/union-return.ts": [
     {
       "function": "echo",
       "property": "p",
@@ -2334,7 +2334,7 @@
       "reason": "'echo' could not be modeled: unmapped TypeScript construct 'UnionType' at 2:43"
     }
   ],
-  "thales/tests/conformance/inappropriate/union-string-argument.ts": [
+  "tests/conformance/inappropriate/union-string-argument.ts": [
     {
       "function": "toNum",
       "property": "p",
@@ -2342,7 +2342,7 @@
       "reason": "unmapped TypeScript construct 'StringLiteral' at 1:18"
     }
   ],
-  "thales/tests/conformance/inappropriate/union-widened-argument.ts": [
+  "tests/conformance/inappropriate/union-widened-argument.ts": [
     {
       "function": "narrow",
       "property": "p",
@@ -2354,7 +2354,7 @@
       }
     }
   ],
-  "thales/tests/fixtures/optionals.ts": [
+  "tests/fixtures/optionals.ts": [
     {
       "function": "pick",
       "property": "absentIsZero",
@@ -2396,7 +2396,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/optional-arity.ts": [
+  "tests/conformance/theorem/optional-arity.ts": [
     {
       "function": "pick",
       "property": "absentIsZero",
@@ -2418,7 +2418,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/optional-misread.ts": [
+  "tests/conformance/countersatisfiable/optional-misread.ts": [
     {
       "function": "pick",
       "property": "absentIsArgument",
@@ -2433,7 +2433,7 @@
       }
     }
   ],
-  "thales/tests/fixtures/object-is-tagged.ts": [
+  "tests/fixtures/object-is-tagged.ts": [
     {
       "function": "skipMixed",
       "property": "mixedTagSkipped",
@@ -2498,7 +2498,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/object-is-boolean-reflexive.ts": [
+  "tests/conformance/theorem/object-is-boolean-reflexive.ts": [
     {
       "function": "probe",
       "property": "same",
@@ -2510,7 +2510,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/object-is-mixed-branch.ts": [
+  "tests/conformance/theorem/object-is-mixed-branch.ts": [
     {
       "function": "pick",
       "property": "alwaysOne",
@@ -2522,7 +2522,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/object-is-undefined-atom.ts": [
+  "tests/conformance/theorem/object-is-undefined-atom.ts": [
     {
       "function": "definedOnly",
       "property": "neverUndefined",
@@ -2534,7 +2534,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/object-is-mixed-tag.ts": [
+  "tests/conformance/countersatisfiable/object-is-mixed-tag.ts": [
     {
       "function": "probe",
       "property": "mixed",
@@ -2549,7 +2549,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/object-is-string.ts": [
+  "tests/conformance/inappropriate/object-is-string.ts": [
     {
       "function": "pick",
       "property": "mixed",
@@ -2557,7 +2557,7 @@
       "reason": "'pick' could not be modeled: 'Object.is' admits numbers, booleans, union values, 'undefined', and 'null'; argument 2 is not one (StringLiteral at 3:20)"
     }
   ],
-  "thales/tests/conformance/theorem/days-to-weeks.ts": [
+  "tests/conformance/theorem/days-to-weeks.ts": [
     {
       "function": "daysToWeeks",
       "property": "nonNegative",
@@ -2569,7 +2569,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/halve-integers.ts": [
+  "tests/conformance/theorem/halve-integers.ts": [
     {
       "function": "halvePosInteger",
       "property": "nonNegative",
@@ -2591,7 +2591,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/ceil-keeps-sign.ts": [
+  "tests/conformance/theorem/ceil-keeps-sign.ts": [
     {
       "function": "dampen",
       "property": "negativeZero",
@@ -2603,7 +2603,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/round-half-up.ts": [
+  "tests/conformance/theorem/round-half-up.ts": [
     {
       "function": "roundHalf",
       "property": "tieRoundsUp",
@@ -2615,7 +2615,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/sign-unit.ts": [
+  "tests/conformance/theorem/sign-unit.ts": [
     {
       "function": "signOf",
       "property": "atMostOne",
@@ -2637,7 +2637,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/fround-narrows.ts": [
+  "tests/conformance/theorem/fround-narrows.ts": [
     {
       "function": "narrow",
       "property": "nonNegative",
@@ -2659,7 +2659,7 @@
       }
     }
   ],
-  "thales/tests/conformance/countersatisfiable/fround-ties-to-even.ts": [
+  "tests/conformance/countersatisfiable/fround-ties-to-even.ts": [
     {
       "function": "narrow",
       "property": "exactPastTwo24",
@@ -2674,7 +2674,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/clamp-to-range.ts": [
+  "tests/conformance/theorem/clamp-to-range.ts": [
     {
       "function": "clamp",
       "property": "atMost",
@@ -2696,7 +2696,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/min-of-three.ts": [
+  "tests/conformance/theorem/min-of-three.ts": [
     {
       "function": "middle",
       "property": "smallestArgument",
@@ -2708,7 +2708,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/integral-scale.ts": [
+  "tests/conformance/theorem/integral-scale.ts": [
     {
       "function": "triple",
       "property": "integral",
@@ -2730,7 +2730,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/beyond-safe-integer.ts": [
+  "tests/conformance/theorem/beyond-safe-integer.ts": [
     {
       "function": "beyond",
       "property": "integral",
@@ -2752,7 +2752,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/epsilon-scale.ts": [
+  "tests/conformance/theorem/epsilon-scale.ts": [
     {
       "function": "tiny",
       "property": "nonNegative",
@@ -2764,7 +2764,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/safe-integer-bound.ts": [
+  "tests/conformance/theorem/safe-integer-bound.ts": [
     {
       "function": "keep",
       "property": "bounded",
@@ -2776,7 +2776,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/infinity-spelled.ts": [
+  "tests/conformance/theorem/infinity-spelled.ts": [
     {
       "function": "shrink",
       "property": "vanishes",
@@ -2788,7 +2788,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/unbounded-clamp.ts": [
+  "tests/conformance/theorem/unbounded-clamp.ts": [
     {
       "function": "clamp",
       "property": "atMost",
@@ -2820,7 +2820,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/unbounded-rounding.ts": [
+  "tests/conformance/theorem/unbounded-rounding.ts": [
     {
       "function": "down",
       "property": "noBigger",
@@ -2862,7 +2862,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/unbounded-round-sign.ts": [
+  "tests/conformance/theorem/unbounded-round-sign.ts": [
     {
       "function": "unit",
       "property": "atMostOne",
@@ -2904,7 +2904,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/unbounded-fround.ts": [
+  "tests/conformance/theorem/unbounded-fround.ts": [
     {
       "function": "narrow",
       "property": "keepsSign",
@@ -2926,7 +2926,7 @@
       }
     }
   ],
-  "thales/tests/conformance/theorem/clamp-identity.ts": [
+  "tests/conformance/theorem/clamp-identity.ts": [
     {
       "function": "capAt5",
       "property": "identityBelow",
@@ -2958,7 +2958,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/math-log.ts": [
+  "tests/conformance/inappropriate/math-log.ts": [
     {
       "function": "integerLog",
       "property": "nonNegative",
@@ -2970,7 +2970,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/number-length.ts": [
+  "tests/conformance/inappropriate/number-length.ts": [
     {
       "function": "arity",
       "property": "nonNegative",
@@ -2982,7 +2982,7 @@
       }
     }
   ],
-  "thales/tests/conformance/inappropriate/math-sqrt-local-alias.ts": [
+  "tests/conformance/inappropriate/math-sqrt-local-alias.ts": [
     {
       "function": "root",
       "property": "nonNegative",

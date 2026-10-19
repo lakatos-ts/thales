@@ -25,7 +25,7 @@ namespace Tarski.Lemma
 open Lean
 
 /-- The lemma release these executables are written against. -/
-def version : String := "0.2.0"
+def version : String := "0.2.1"
 
 /-- The document version these executables read: `SCHEMA_VERSION` in
 `lemma/src/document.ts`. 1 carries each annotation's outcome. -/

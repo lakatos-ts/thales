@@ -145,7 +145,7 @@ describe.runIf(e2e)("tarski <file.ts>", () => {
       "a proof's model is checked against the evaluator per declaration",
     );
     expect(prose).toContain("refute runs on Node");
-    expect(prose).toContain("lemma@0.2.0");
+    expect(prose).toContain("lemma@0.2.1");
     expect(p.run("-h").stdout).toBe(r.stdout);
   });
 
@@ -229,7 +229,7 @@ describe.runIf(e2e)("tarski without LAKATOS_LEMMA", () => {
   let fakeBin = "";
   let log = "";
   let p: ReturnType<typeof project>;
-  const cache = () => path.join(home, ".cache", "lakatos", "lemma@0.2.0");
+  const cache = () => path.join(home, ".cache", "lakatos", "lemma@0.2.1");
 
   /** A run with the fake npm first on PATH and the scratch HOME. */
   const run = (env: NodeJS.ProcessEnv = {}): Run => {
@@ -268,7 +268,7 @@ describe.runIf(e2e)("tarski without LAKATOS_LEMMA", () => {
         'if [ -n "$FAKE_NPM_SLEEP" ]; then sleep "$FAKE_NPM_SLEEP"; fi',
         'pkg="$3/node_modules/@lakatos/lemma"',
         'mkdir -p "$pkg"',
-        `printf '{"name":"@lakatos/lemma","version":"%s"}' "\${FAKE_NPM_VERSION:-0.2.0}" > "$pkg/package.json"`,
+        `printf '{"name":"@lakatos/lemma","version":"%s"}' "\${FAKE_NPM_VERSION:-0.2.1}" > "$pkg/package.json"`,
         'ln -s "$FAKE_NPM_LEMMA/dist" "$pkg/dist"',
         "",
       ].join("\n"),
@@ -287,7 +287,7 @@ describe.runIf(e2e)("tarski without LAKATOS_LEMMA", () => {
     const r = run({ FAKE_NPM_FAIL: "1" });
     expect(r.code).toBe(2);
     expect(r.stderr).toContain(
-      "tarski: npm could not install @lakatos/lemma@0.2.0",
+      "tarski: npm could not install @lakatos/lemma@0.2.1",
     );
     expect(r.stderr).toContain("npm error 404 Not Found");
     expect(r.stderr).toContain("set LAKATOS_LEMMA");
@@ -298,7 +298,7 @@ describe.runIf(e2e)("tarski without LAKATOS_LEMMA", () => {
     const r = run({ FAKE_NPM_VERSION: "0.1.9" });
     expect(r.code).toBe(2);
     expect(r.stderr).toContain(
-      "npm installed @lakatos/lemma 0.1.9, not the pinned 0.2.0",
+      "npm installed @lakatos/lemma 0.1.9, not the pinned 0.2.1",
     );
     expect(existsSync(cache())).toBe(false);
   });
@@ -307,7 +307,7 @@ describe.runIf(e2e)("tarski without LAKATOS_LEMMA", () => {
     const before = installs();
     expect(run()).toEqual({ code: 0, stdout: "a 1\n", stderr: "" });
     expect(installs()).toBe(before + 1);
-    expect(readFileSync(log, "utf8")).toContain("lemma@0.2.0");
+    expect(readFileSync(log, "utf8")).toContain("lemma@0.2.1");
     expect(
       existsSync(path.join(cache(), "node_modules/@lakatos/lemma/dist/cli.js")),
     ).toBe(true);
@@ -354,7 +354,7 @@ describe.runIf(e2e)("tarski without LAKATOS_LEMMA", () => {
     );
     expect(codes).toEqual([0, 0, 0, 0, 0, 0]);
     const parent = path.dirname(cache());
-    expect(readdirSync(parent)).toEqual(["lemma@0.2.0"]);
+    expect(readdirSync(parent)).toEqual(["lemma@0.2.1"]);
   });
 });
 

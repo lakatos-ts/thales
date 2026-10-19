@@ -9,7 +9,8 @@ export const engineRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
 );
-export const repoRoot = path.resolve(engineRoot, "..");
+/** The package is its repository. */
+export const repoRoot = engineRoot;
 
 /** The Lean binary, built: the checks run what the tool runs. */
 export function thalesBinary() {

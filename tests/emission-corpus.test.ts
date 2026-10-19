@@ -28,73 +28,67 @@ function emissionOf(file: string): Emission {
 
 describe("the emission over thales's fixtures", () => {
   test.each([
-    ["thales/tests/fixtures/tracer.ts"],
-    ["thales/tests/fixtures/statements.ts"],
-    ["thales/tests/fixtures/binders.ts"],
-    ["thales/tests/fixtures/degradations.ts"],
-    ["thales/tests/fixtures/classes.ts"],
-    ["thales/tests/fixtures/class-params.ts"],
-    ["thales/tests/fixtures/module-consts.ts"],
-    ["thales/tests/fixtures/nested-class-binder.ts"],
-    ["thales/tests/fixtures/unions.ts"],
-    ["thales/tests/fixtures/optionals.ts"],
-    ["thales/tests/fixtures/defaults.ts"],
-    ["thales/tests/fixtures/ctor-defaults.ts"],
-    ["thales/tests/fixtures/instance-defaults.ts"],
-    ["thales/tests/fixtures/object-is-tagged.ts"],
-    ["thales/tests/fixtures/fields.ts"],
-    ["thales/tests/conformance/theorem/class-binder-equality-guards.ts"],
-    ["thales/tests/conformance/theorem/boolean-classes.ts"],
+    ["tests/fixtures/tracer.ts"],
+    ["tests/fixtures/statements.ts"],
+    ["tests/fixtures/binders.ts"],
+    ["tests/fixtures/degradations.ts"],
+    ["tests/fixtures/classes.ts"],
+    ["tests/fixtures/class-params.ts"],
+    ["tests/fixtures/module-consts.ts"],
+    ["tests/fixtures/nested-class-binder.ts"],
+    ["tests/fixtures/unions.ts"],
+    ["tests/fixtures/optionals.ts"],
+    ["tests/fixtures/defaults.ts"],
+    ["tests/fixtures/ctor-defaults.ts"],
+    ["tests/fixtures/instance-defaults.ts"],
+    ["tests/fixtures/object-is-tagged.ts"],
+    ["tests/fixtures/fields.ts"],
+    ["tests/conformance/theorem/class-binder-equality-guards.ts"],
+    ["tests/conformance/theorem/boolean-classes.ts"],
   ])("the emission for %s validates against the schema", (fixture) => {
     expectValidEmission(emissionOf(fixture));
   });
 
   test.each([
-    ["thales/tests/fixtures/tracer.ts", "tracer.emission.json"],
-    ["thales/tests/fixtures/operators.ts", "operators.emission.json"],
-    ["thales/tests/fixtures/statements.ts", "statements.emission.json"],
-    ["thales/tests/fixtures/binders.ts", "binders.emission.json"],
-    ["thales/tests/fixtures/degradations.ts", "degradations.emission.json"],
-    ["thales/tests/fixtures/classes.ts", "classes.emission.json"],
-    ["thales/tests/fixtures/class-params.ts", "class-params.emission.json"],
-    ["thales/tests/fixtures/module-consts.ts", "module-consts.emission.json"],
+    ["tests/fixtures/tracer.ts", "tracer.emission.json"],
+    ["tests/fixtures/operators.ts", "operators.emission.json"],
+    ["tests/fixtures/statements.ts", "statements.emission.json"],
+    ["tests/fixtures/binders.ts", "binders.emission.json"],
+    ["tests/fixtures/degradations.ts", "degradations.emission.json"],
+    ["tests/fixtures/classes.ts", "classes.emission.json"],
+    ["tests/fixtures/class-params.ts", "class-params.emission.json"],
+    ["tests/fixtures/module-consts.ts", "module-consts.emission.json"],
     [
-      "thales/tests/fixtures/nested-class-binder.ts",
+      "tests/fixtures/nested-class-binder.ts",
       "nested-class-binder.emission.json",
     ],
-    ["thales/tests/fixtures/unions.ts", "unions.emission.json"],
-    ["thales/tests/fixtures/optionals.ts", "optionals.emission.json"],
-    ["thales/tests/fixtures/defaults.ts", "defaults.emission.json"],
-    ["thales/tests/fixtures/ctor-defaults.ts", "ctor-defaults.emission.json"],
+    ["tests/fixtures/unions.ts", "unions.emission.json"],
+    ["tests/fixtures/optionals.ts", "optionals.emission.json"],
+    ["tests/fixtures/defaults.ts", "defaults.emission.json"],
+    ["tests/fixtures/ctor-defaults.ts", "ctor-defaults.emission.json"],
+    ["tests/fixtures/instance-defaults.ts", "instance-defaults.emission.json"],
+    ["tests/fixtures/object-is-tagged.ts", "object-is-tagged.emission.json"],
+    ["tests/fixtures/fields.ts", "fields.emission.json"],
     [
-      "thales/tests/fixtures/instance-defaults.ts",
-      "instance-defaults.emission.json",
-    ],
-    [
-      "thales/tests/fixtures/object-is-tagged.ts",
-      "object-is-tagged.emission.json",
-    ],
-    ["thales/tests/fixtures/fields.ts", "fields.emission.json"],
-    [
-      "thales/tests/conformance/theorem/class-binder-equality-guards.ts",
+      "tests/conformance/theorem/class-binder-equality-guards.ts",
       "class-binder-equality-guards.emission.json",
     ],
     [
-      "thales/tests/conformance/theorem/boolean-classes.ts",
+      "tests/conformance/theorem/boolean-classes.ts",
       "boolean-classes.emission.json",
     ],
   ])(
     "the pinned emission for %s is exactly what lemma emits",
     (fixture, pin) => {
       const pinned = JSON.parse(
-        fs.readFileSync(`thales/tests/fixtures/${pin}`, "utf8"),
+        fs.readFileSync(`tests/fixtures/${pin}`, "utf8"),
       );
       expect(emissionOf(fixture)).toEqual(pinned);
     },
   );
 
   test("every stacked JSDoc block's @ensures becomes its own obligation", () => {
-    const fixture = "thales/tests/conformance/theorem/stacked-blocks.ts";
+    const fixture = "tests/conformance/theorem/stacked-blocks.ts";
     expect(emissionOf(fixture).obligations.map((o) => o.property)).toEqual([
       "nonNegative",
       "atLeastOne",
@@ -108,14 +102,14 @@ describe("the emission over thales's fixtures", () => {
  * each one keeps any other exception visible. */
 const WITHOUT_AST: Record<string, string[]> = {
   // #570: the importer's `b` is dep's `inner`.
-  "thales/tests/conformance/theorem/aliased-export/main.ts": ["top"],
+  "tests/conformance/theorem/aliased-export/main.ts": ["top"],
 };
 
 /** Every `.ts` the emission store is built from: acceptance criterion 1's
  * frontend half, every emitted declaration carries an ast, but for the
  * exceptions `WITHOUT_AST` names. */
 function storeInputs(): string[] {
-  const roots = ["thales/tests/fixtures", "thales/tests/conformance"];
+  const roots = ["tests/fixtures", "tests/conformance"];
   const out: string[] = [];
   const walk = (dir: string): void => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {

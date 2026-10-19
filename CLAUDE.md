@@ -1,20 +1,18 @@
 # CLAUDE.md
 
-Thales is lakatos's proof tool: the `thales` executable, a Lean program (`lake build thales`). Its sources are Lean and it is not an npm package (its suites and check scripts run from the repo root); it reaches lemma, the TypeScript front end, as a subprocess. (Running one file on the evaluator behind the same typecheck gate is `tarski <file.ts>`, from this same package; see the semantics section below.) Annotated TypeScript is emitted as plain Lean 4, Lean attempts to prove each `@ensures` property against a model of each function, and one SZS verdict per annotation comes back as a JSON envelope.
+Thales is lakatos's proof tool: the `thales` executable, a Lean program (`lake build thales`). Its sources are Lean; a private `package.json` carries the TypeScript suites, the check scripts, and the pinned lemma. It reaches lemma, the TypeScript front end, as a subprocess. (Running one file on the evaluator behind the same typecheck gate is `tarski <file.ts>`, from this same package; see the semantics section below.) Annotated TypeScript is emitted as plain Lean 4, Lean attempts to prove each `@ensures` property against a model of each function, and one SZS verdict per annotation comes back as a JSON envelope.
 
 Three Lean libraries, one tool:
 
 - **`Thales/`** — the tool: `thales [files-or-globs...]`, `--help`, and `run-artifact <file.lean>` (one artifact's parsed verdict channel, for the check scripts). It starts lemma through `Tarski.Lemma`, reads lemma's v1 documents, renders each artifact in process, runs `lake env lean` per artifact, joins the channels, and prints the envelope as `Lean.Json`. Start at `Thales/Prove.lean` (the spine) and `Thales/Cli.lean`.
 - **`ThalesDsl/`** — the prover, built on the JS-semantics library in `Js/` (read the semantics section below before touching it); artifacts import it and are run with `lake env lean`. Start at `ThalesDsl/Prove.lean` (the tactic ladder) and `Js/Runtime.lean` (the semantic domain). Toolchain pinned in `lean-toolchain`; `lake-manifest.json` is tracked.
-- **`ThalesEmit/`** — the renderer, called in process by `Thales/`: lemma's emission in, a readable `.lean` artifact out. The emitter itself (tsc AST → per-declaration JSON, and the classification of what it cannot map) is lemma's, `lemma/src/emission.ts`: its output is the `emission` of a `lemma check` document, and the invariants below are thales's contract with it. Its unit tests are lemma's; `tests/emission-corpus.test.ts` pins what it emits for this package's fixtures and corpus.
+- **`ThalesEmit/`** — the renderer, called in process by `Thales/`: lemma's emission in, a readable `.lean` artifact out. The emitter itself (tsc AST → per-declaration JSON, and the classification of what it cannot map) is lemma's (its `src/emission.ts`): its output is the `emission` of a `lemma check` document, and the invariants below are thales's contract with it. Its unit tests are lemma's; `tests/emission-corpus.test.ts` pins what it emits for this package's fixtures and corpus.
 
-Annotation parsing is not here: discovery, extraction, and prefix/formula parsing live in `lemma/`; the Lean side never sees Lemma syntax.
+Annotation parsing is not here: discovery, extraction, and prefix/formula parsing live in lemma; the Lean side never sees Lemma syntax.
 
-Docs under `docs/adr/`, `docs/specs/`, `docs/beyond-typescript.md`, and `CHANGELOG.md` predate the plain-Lean rewrite and still describe the removed whole-file compiler (its own, earlier `Thales/` library and `thales` executable, TH-code diagnostics). Trust the code, not those. `CONTEXT.md` holds the engine's vocabulary.
+GitHub Issues on `lakatos-ts/thales` is the tracker (`docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md`). Docs under `docs/adr/`, `docs/specs/`, `docs/beyond-typescript.md`, and `CHANGELOG.md` predate the plain-Lean rewrite and still describe the removed whole-file compiler (its own, earlier `Thales/` library and `thales` executable, TH-code diagnostics). Trust the code, not those. `CONTEXT.md` holds the engine's vocabulary.
 
 ## Common commands
-
-From `thales/`:
 
 ```bash
 lake build                       # every library and all three executables
@@ -23,24 +21,25 @@ lake env lean Test/ThalesDsl/BindersTest.lean # one Lean test file in isolation
 lake build thales                # just the thales binary
 ```
 
-From the repo root (the tests and check scripts run there):
+The TypeScript side:
 
 ```bash
-npm run build                      # lemma's bin, which the binary and the check scripts run
-npx vitest run thales/tests        # the suites; the bin suites skip without LAKATOS_PROVE_E2E=1
-npm run format:check               # prettier, whole repo, one config
-LAKATOS_PROVE_E2E=1 npx vitest run thales/tests/e2e.test.ts   # full prove e2e (needs Lean)
-npm run check:verdict-channel      # verdict-line contract over thales/tests/fixtures/*.lean
+npm ci                             # the suites' dependencies, the pinned lemma among them
+npm run typecheck                  # the suites and their fixtures
+npx vitest run                     # the suites; the bin suites skip without LAKATOS_PROVE_E2E=1
+npm run format:check               # prettier
+LAKATOS_PROVE_E2E=1 npx vitest run tests/e2e.test.ts   # full prove e2e (needs Lean)
+npm run check:verdict-channel      # verdict-line contract over tests/fixtures/*.lean
 npm run check:envelopes            # the binary's envelopes against stored expectations
                                    # (LAKATOS_PROVE_E2E=1 adds the corpus manifest)
 UPDATE_ENVELOPES=1 LAKATOS_PROVE_E2E=1 npm run check:envelopes   # regenerate the store
 ```
 
-Run the binary from a project directory (where `tsconfig.json` is) with `LAKATOS_LEMMA` set to this checkout's `lemma/` (built): `LAKATOS_LEMMA=/path/to/lakatos/lemma timeout 600 /path/to/lakatos/thales/.lake/build/bin/thales <file.ts>`.
+Run the binary from a project directory (where `tsconfig.json` is): `timeout 600 /path/to/thales/.lake/build/bin/thales <file.ts>`. It runs the pinned lemma release (`Tarski/Lemma.lean`'s `version`, installed once into `~/.cache/lakatos/`); `LAKATOS_LEMMA=<built lemma checkout>` runs an unreleased one instead.
 
 After changing `ThalesDsl` or `ThalesEmit`, rebuild with `lake build thales`: the run's own `lake build` builds only the default target, so the binary and the `ThalesEmit` library it loads would stay stale.
 
-Always wrap `lake env lean` invocations in a timeout when running them by hand; a bad artifact can grind indefinitely. The check scripts build and run the binary (`scripts/harness.js`): the verdict channel goes through `thales run-artifact`, the envelopes through a staged project per fixture with `LAKATOS_LEMMA` set to this checkout's lemma, so the sentinel, the parse, and the lake invocation are production's, never a copy.
+Always wrap `lake env lean` invocations in a timeout when running them by hand; a bad artifact can grind indefinitely. The check scripts build and run the binary (`scripts/harness.js`): the verdict channel goes through `thales run-artifact`, the envelopes through a staged project per fixture, so the sentinel, the parse, and the lake invocation are production's, never a copy.
 
 ## The prove pipeline
 
@@ -98,12 +97,12 @@ Beside the verdicts, each `#thales_validate` prints exactly one line: `thales-mo
 - An artifact's lean timeout grows by `VALIDATE_TIMEOUT_MS` per `#thales_validate` it carries, so a file with many validated declarations is not killed for being large.
 - **An unvalidated model never moves a verdict.** The command's `simp` can get stuck but cannot refute, so a model line reports what was established about the correspondence and nothing about the properties. The envelope's `model` field joins these lines onto annotations: required on a `Theorem`, carried on the prover's `GaveUp`, `Timeout`, `CounterSatisfiable`, and `Inappropriate`, and on no other status and no refuter entry.
 
-The `Szs` inductive here is the prove pipeline's status set, and `tests/verdict-contract.test.ts` checks that each constructor goes on the wire under its own name. Nothing in this package pins it against the shared vocabulary, the `szs` values of the repo's `spec/envelope.schema.json` (which add the CLI-only `InputError` and `User`): a new status is an edit to both.
+The `Szs` inductive here is the prove pipeline's status set, and `tests/verdict-contract.test.ts` checks that each constructor goes on the wire under its own name. Nothing in this package pins it against the shared vocabulary, the `szs` values of the umbrella's `spec/envelope.schema.json` (which add the CLI-only `InputError` and `User`): a new status is an edit to both.
 
 ## Tests
 
 - `Test/ThalesDsl/`, `Test/ThalesEmit/` — Lean unit tests, one directory per library; `AstTest.lean` is one guard per AST constructor plus the round trip that makes the rendered term the decoder's output and not a second reading of the JSON; there is a `ValidateTest.lean` in each, the closer's behaviour in the first and the emitter's choice of command in the second, while the model lines themselves are pinned by `tests/fixtures/validate.lean` through `check:verdict-channel`; the library's own tests are `Test/Js/`. Location follows ownership: a `ThalesDsl` import under `Test/Js/` is a boundary violation by inspection.
-- `tests/*.test.ts` — vitest, from the repo root: the check scripts' shard helpers, and the bins' suites, driven against the built `thales` binary (`tests/helpers/cli.ts`) and gated behind `LAKATOS_PROVE_E2E=1`; the ones that need a failing or interrupted engine put a fake `lake` ahead of the real one on PATH. The check scripts use `thales run-artifact` for the verdict channel and a staged project per fixture for the envelopes; the envelope store holds envelope projections, compared as values.
+- `tests/*.test.ts` — vitest: the check scripts' shard helpers, and the bins' suites, driven against the built `thales` binary (`tests/helpers/cli.ts`) and gated behind `LAKATOS_PROVE_E2E=1`; the ones that need a failing or interrupted engine put a fake `lake` ahead of the real one on PATH. The check scripts use `thales run-artifact` for the verdict channel and a staged project per fixture for the envelopes; the envelope store holds envelope projections, compared as values.
 - `tests/conformance/` — `.ts` fixtures bucketed by the SZS status every annotation in them must receive, run end to end by `tests/verdict-corpus.test.ts` (gated like the prove e2e). Its README has the bucket conventions.
 - CI: `.github/workflows/lean.yml` runs lake build, the Lean tests, the semantics' fixture scripts, the test262 slice, both boundary checks, both check scripts (envelopes over the full manifest), and the gated e2e + corpus.
 
@@ -113,17 +112,15 @@ The `Szs` inductive here is the prove pipeline's status set, and `tests/verdict-
 - **Failure containment over abortion.** A construct the engine can't handle degrades that declaration, that annotation, or that artifact — never the run. New emission shapes must preserve this.
 - **One verdict line per `#thales_prove`, always**, even for failures the elaborator can see. Annotations lemma classifies never enter the channel; the run joins them from each document's annotation outcomes.
 - **Boundary rule:** nothing under `Js/` or `Tarski/` may import `ThalesDsl`, `ThalesEmit`, or `Thales`, or mention any emission concern; `scripts/check-imports.sh` enforces the imports in CI, against a planted violation under `scripts/import-fixture/` too.
-- **Lean builds here; the tests and check scripts run from the repo root**, whose `package.json` carries `check:envelopes` and `check:verdict-channel`. There is no `package.json` here. Formatting is root-only: one prettier pin, one config.
+- **The `package.json` is private** and carries the suites, `check:envelopes`, `check:verdict-channel`, and the exact lemma release the Lean pins; bump the two together.
 
 ## The semantics and the evaluator (`Js/`, `Tarski/`)
 
 Tarski is lakatos's JS-semantics library: the Lean definitions that give TypeScript's values and operations their meaning. `thales` proves `@ensures` properties against models built from these definitions. It sits below the prover in this package: nothing under `Js/` or `Tarski/` imports the prover's libraries or mentions any emission concern — lakatos owns syntax and search, this library owns meaning.
 
-It holds two things over one set of definitions. `Js/` is the semantics library. `Tarski/` is an evaluator for a fragment of JavaScript — a definitional interpreter whose every primitive operation _is_ one of the library's, so a `Theorem` and a run appeal to the same meaning. The evaluator's parser is not in Lean: lemma's parser bridge (`lemma/src/estree.ts`, over tsc) emits ESTree JSON, and `lemma/schemas/tarski-estree.schema.json` is the seam. `Tarski/Test262/` is the test262 runner, `tarski-test262`. `tarski <file.ts>` reaches lemma itself, as a subprocess: `Tarski/Lemma.lean` resolves its bin (`LAKATOS_LEMMA=<checkout>`, or the pinned release installed once into `~/.cache/lakatos/lemma@<version>`), runs `lemma check`, and decodes the document, and `thales` and the test262 runner reuse it. Growing the evaluator is GitHub epic #376.
+It holds two things over one set of definitions. `Js/` is the semantics library. `Tarski/` is an evaluator for a fragment of JavaScript — a definitional interpreter whose every primitive operation _is_ one of the library's, so a `Theorem` and a run appeal to the same meaning. The evaluator's parser is not in Lean: lemma's parser bridge (its `src/estree.ts`, over tsc) emits ESTree JSON, and lemma's `schemas/tarski-estree.schema.json` is the seam. `Tarski/Test262/` is the test262 runner, `tarski-test262`. `tarski <file.ts>` reaches lemma itself, as a subprocess: `Tarski/Lemma.lean` resolves its bin (`LAKATOS_LEMMA=<checkout>`, or the pinned release installed once into `~/.cache/lakatos/lemma@<version>`), runs `lemma check`, and decodes the document, and `thales` and the test262 runner reuse it. Growing the evaluator is GitHub epic #376.
 
 ### Common commands
-
-From `thales/`:
 
 ```bash
 lake build tarski                   # just the evaluator's binary
@@ -133,14 +130,13 @@ sh scripts/check-boundary.sh        # the evaluator's arithmetic boundary
 sh scripts/check-imports.sh         # Js/ and Tarski/ import nothing of the prover
 ```
 
-And the test262 runner, `tarski-test262`, which parses through lemma
-(`npm run build` at the repo root first):
+And the test262 runner, `tarski-test262`, which parses through lemma:
 
 ```bash
 lake build tarski-test262
 .lake/build/bin/tarski-test262 setup     # fetch the pin into .test262 (or set LAKATOS_TEST262)
-LAKATOS_LEMMA=$PWD/../lemma .lake/build/bin/tarski-test262 --slice-file test262/slice.txt
-LAKATOS_LEMMA=$PWD/../lemma .lake/build/bin/tarski-test262 --slice-file test262/slice.txt \
+.lake/build/bin/tarski-test262 --slice-file test262/slice.txt
+.lake/build/bin/tarski-test262 --slice-file test262/slice.txt \
   --check test262/expected.json
 sh scripts/test262-full.sh               # the scheduled full run; writes test262/results.{md,json}
 ```
@@ -150,18 +146,18 @@ runner labels a results table with the commit that checkout is really at.
 `--jobs` (default: the core count) bounds the `tarski` children running at
 once. `TEST262_TIMEOUT_MS` (default 10000) and `TEST262_BUDGET_MS` (default
 14400000, four hours) are what `test262-full.sh` passes as `--timeout` and
-`--budget`; the script defaults `LAKATOS_LEMMA` to this checkout's lemma.
+`--budget`.
 
 The binary lands at `.lake/build/bin/tarski` and takes one ESTree document:
 
 ```bash
-node ../lemma/dist/cli.js parse t.js | jq .program > t.json   # after npm run build
+node node_modules/@lakatos/lemma/dist/cli.js parse t.js | jq .program > t.json   # after npm ci
 .lake/build/bin/tarski run t.json    # the completion value is a line of output
 .lake/build/bin/tarski exec t.json   # it is not; this is what `tarski <file.ts>` runs
-LAKATOS_LEMMA=../lemma .lake/build/bin/tarski t.ts   # one TypeScript file, through lemma's gate
+.lake/build/bin/tarski t.ts         # one TypeScript file, through lemma's gate
 ```
 
-The suites that spawn the evaluator's and the runner's binaries are in `tests/tarski/`, run by the root vitest.
+The suites that spawn the evaluator's and the runner's binaries are in `tests/tarski/`.
 
 Wrap `lake env lean` in a timeout when running it by hand; a bad artifact can grind indefinitely.
 

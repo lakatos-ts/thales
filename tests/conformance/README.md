@@ -12,7 +12,7 @@ as nodeNext writes them). Only the entry's annotations are graded, and the
 bucket's status applies to them; the dependencies are never run as entries,
 so annotations in them would go unchecked and do not belong there.
 
-The harness is `thales/tests/verdict-corpus.test.ts`, gated on
+The harness is `tests/verdict-corpus.test.ts`, gated on
 `LAKATOS_PROVE_E2E=1` like the prove e2e (it needs the Lean toolchain and is
 minutes-slow). It copies the corpus into a scratch project, runs
 `thales` once over every fixture, and diffs each annotation's status
@@ -24,7 +24,7 @@ lakatos forces its required strict options on top, and the harness copies
 the config into the scratch project so the gate runs there exactly as it
 does for a user. Check the corpus standalone with
 
-    npx tsc -p thales/tests/conformance --noEmit --strict
+    npx tsc -p tests/conformance --noEmit --strict
 
 A program tsc refuses is not a fixture: the gate answers for it, so it has
 no bucket here.
