@@ -1,65 +1,59 @@
-# Thales
+# Thales vocabulary
 
-Thales is lakatos's proof engine: a TypeScript frontend emits plain Lean 4 for `@ensures`-annotated functions, and Lean attempts to prove each property, reporting one SZS verdict per annotation. The user-visible surface is the `thales` bin; running one file on the tarski evaluator is `tarski <file.ts>`.
+The terms the engine's code, comments, and issues use. Older docs (`docs/adr/`, `docs/specs/`, `CHANGELOG.md`) use a removed compiler's vocabulary — refinement types, prelude library types, TH#### diagnostics — and are historical.
 
-The vocabulary below is for the rewritten engine. The previous compiler's vocabulary (refinement types, prelude library types, TH#### subset diagnostics, the conformance harness) was retired with it; treat any occurrence in older notes as historical.
-
-## Language
-
-### Pipeline vocabulary
+## Pipeline
 
 **Emission**:
-The frontend pass (lemma's `emission.ts`) that walks tsc's AST into per-declaration JSON, which thales's renderer (`ThalesEmit`) renders as ordinary Lean — a `def` per function, a `#thales_prove` command per obligation. What it cannot map it does not emit: the frontend classifies that annotation itself, so the artifact only ever carries declarations with a model.
+lemma's per-declaration JSON for a source file, which `ThalesEmit` renders as ordinary Lean: a `def` per function, a `#thales_prove` per obligation. It carries only declarations with a model; what lemma cannot map, it classifies instead.
 
 **Classification**:
-The frontend's own verdict on an annotation it will not emit: `Inappropriate` when the input is outside the model (an unmapped construct, a refused operator), `NotTried` when a safe-integer clamp is the sole blocker, `Error` when the engine is the one at fault. A classified annotation never reaches Lean; the CLI joins its verdict into the envelope alongside the ones Lean reports.
-_Avoid_: "unsupported placeholder" (the old compiler's accept-then-fail hazard; classification is contained by design)
+lemma's own verdict on an annotation it will not emit: `Inappropriate` (outside the model: an unmapped construct, a refused operator), `NotTried` (a safe-integer clamp is the sole blocker), or `Error` (the engine is at fault). A classified annotation never reaches Lean; the join adds it to the envelope.
 
 **Failed declaration**:
-A declaration the emitter could not model, recorded with the construct that stopped it. The refusal travels with the call, so a function calling one degrades the same way — which is what makes a caller of an unmapped import `Inappropriate` rather than `Error`.
+A declaration the emitter could not model, recorded with the construct that stopped it. A use of it reports that same reason, so a caller of an unmapped import is `Inappropriate`, not `Error`.
 
-**Artifact / artifact mirror**:
-The generated `.lean` file for one source file, written under the run directory's `thales/` mirror by the shared mirroring rule (source extension kept: `a.ts` → `<run>/thales/a.ts.lean`). Annotation-free sources get no artifact. Artifacts are regenerated every run and never hand-edited.
+**Artifact**:
+The generated `.lean` file for one source file, at `<run>/thales/<source path>.lean` (`a.ts` → `a.ts.lean`). Regenerated every run, never hand-edited; a source with no annotations gets none.
 
 **Model**:
-The Lean `def` an emitted declaration becomes, under the `TsModel` namespace and tagged `@[js_norm, grind]` so the symbolic rungs can unfold it (a class becomes a `TsModel` structure with a `construct` and one def per getter and method). Results are typed `Float` — IEEE-754 binary64, the type a TypeScript `number` actually holds — over the `JsM` monad; a parameter may also be an instance of a modeled class or a keyword union over the tagged `JsVal` domain, and a field or a local may be a `Float`, that same keyword-union `JsVal`, or an instance of an earlier class. `int`/`nat` binders still quantify over the mathematical integers and coerce in at the call boundary, which is exactly why an interval reaching past the safe-integer range is refused: outside it the coercion stops being injective. A declaration whose signature or statements fall outside the model is classified frontend-side, with the construct recorded; an unmodelable expression inside an otherwise-modeled body becomes a residual instead.
+The Lean `def` a declaration becomes, under `TsModel` and tagged `@[js_norm, grind]` so the symbolic rungs can unfold it. A class becomes a structure with a `construct` and one def per getter and method. Numbers are `Float` (binary64, what a TypeScript `number` holds) in the `JsM` monad; unions and optionals are a `JsVal`. `int`/`nat` binders quantify over the mathematical integers and coerce at the call, which is why an interval past the safe-integer range is refused: there the coercion stops being injective.
 
 **Residual**:
-An unmodelable expression's stand-in in a model: a site-distinct `noncomputable opaque`, applied to the modeled variables in scope at the site and valued in `JsM`, with the refusal text that names the construct as its docstring. The encoded assumption is that unmodeled code is a deterministic, possibly throwing function of the modeled scope that does not mutate it — an expression that assigns inside is refused outright, and mutation through a call is the assumption's stated risk, which the refuter can still expose. Two sites are never identified, however alike their source text. A proof that never forces a site succeeds as before; the grind rung reports a goal whose every failing leaf forces one as `Inappropriate`, naming the constructs, while a leaf failing on its own arithmetic keeps its `GaveUp`. Never a throw stub: a model that throws inside a guard would prove what the real code falsifies. `noncomputable` is load-bearing — a valueless opaque compiles to `pure`, which compiled evaluation would prove straight through — so every model reaching a residual is a noncomputable def.
-_Avoid_: "stub", "placeholder" (a residual asserts nothing about the value)
+The stand-in for an unmodelable expression inside an otherwise-modeled body: a per-site `noncomputable opaque` over the modeled variables in scope, valued in `JsM`, with the refusal text as its docstring. It assumes the unmodeled code is a deterministic, possibly throwing function of that scope that does not mutate it, so an expression that assigns is refused outright. Two sites are never identified. A proof that never forces a site succeeds as usual; a goal whose every failing leaf forces one is `Inappropriate`, naming the constructs. `noncomputable` is load-bearing: a valueless opaque compiles to `pure`, which compiled evaluation would prove straight through.
+_Avoid_: "stub", "placeholder" (a residual asserts nothing about the value).
 
 **JsM**:
-The semantic domain of models: `Except JsError` today, growing with future slices (state, fuel). The load-bearing property is computability — the decide rungs must be able to evaluate models over bounded domains, so nothing noncomputable may enter a model's type. With binary64 bodies this is the only route to a proof at all: vanilla Lean carries no `Float` arithmetic theory, so a domain that cannot be enumerated cannot yet be settled.
+The semantic domain of models, `Except JsError`. Its load-bearing property is computability: the decide rungs evaluate models over bounded domains, and with no binary64 theory in Lean that is often the only route to a proof.
 
-**Bounded quantification (`ballIco`)**:
-The half-open-interval ∀ that Lemma binder guards elaborate to, carrying its own `Decidable` instance. It is the reason bounded properties are decidable at all.
+**`ballIco`**:
+The half-open-interval ∀ that binder guards elaborate to, with its own `Decidable` instance; the reason bounded properties are decidable at all.
 
-### Verdict vocabulary
+## Verdicts
 
 **Verdict channel**:
-The stdout contract between `#thales_prove` and the CLI: one sentinel-framed (`thales-verdict:`) compact-JSON line per annotation, in command order. Unframed stdout is Lean diagnostics, forwarded to stderr by the runner — never part of the contract.
-_Avoid_: "output", "log lines" (framing is what makes it a contract)
+The stdout contract between `#thales_prove` and the tool: one `thales-verdict:`-framed compact-JSON line per annotation. Unframed stdout is Lean diagnostics and never contract.
+
+**Model line**:
+The `thales-model:` line each `#thales_validate` prints, saying whether the model was shown to agree with the evaluator (`validated`) or not, and why (`unvalidated`). It never changes a verdict.
 
 **Identity**:
-The `[file, function, property]` triple keying each annotation, shared with the refutation engine so both engines' results join into one envelope. Function names use the qualified form (`fn`, `Class#method`, `Class.method`).
+The `[file, function, property]` triple keying each annotation. Function names are qualified: `fn`, `Class#method`, `Class.method`.
 
-**SZS statuses (prove)**:
-`Theorem` (a rung of the ladder proved it; the verdict's `axioms` field lists the non-standard axioms the proof rests on — empty when kernel-checked, the admitted native-evaluation axiom otherwise), `CounterSatisfiable` (the property is false on its bounded domain and a concrete witness was extracted — carried in the verdict's `counterexample` field), `GaveUp` (elaborated but the proof attempt failed, including falsity with no witness to ship: zero binders, or witness extraction degraded), `Inappropriate` (unmapped construct or refused operator in the function or property), `Error` (any other failure), `NotTried` (no structured property provided), `Timeout` (the attempt exceeded the per-annotation heartbeat budget). The set is the `Szs` inductive in `Verdict.lean`, and it must be the `szs` values of the repo's `spec/envelope.schema.json` less the CLI-only `InputError` and `User`; nothing checks the two agree.
-_Avoid_: inventing statuses locally; a status the CLI does not know is not on the wire
+**SZS statuses**:
+The `Szs` inductive in `ThalesDsl/Verdict.lean`. `Theorem` (proved; `axioms` lists the non-standard axioms it rests on, empty when kernel-checked), `CounterSatisfiable` (false on the bounded domain, with a `counterexample`), `GaveUp` (the ladder ran out, including falsity with no witness to ship), `Inappropriate` (outside the model), `Error` (the engine broke), `NotTried` (no structured property), `Timeout` (the heartbeat budget ran out). The envelope adds `InputError` and `User`, which no Lean command emits.
+
+**Verdict vs envelope entry**:
+A verdict is a line Lean prints; an envelope entry is the per-annotation record after the join, which also carries lemma's classifications. Lean emits verdicts, never envelopes.
 
 **Failure containment**:
-The engine's degradation ladder: a bad construct fails one declaration (a failed declaration), a bad property fails one annotation (its verdict), a bad artifact fails one file (a per-file failure in the run result) — the run always completes and healthy verdicts still ship. Whole-run aborts are reserved for lake build failures and missing engine roots.
-_Avoid_: "error handling" (containment is the design property, not incidental recovery)
+The degradation ladder: a bad construct fails one declaration, a bad property one annotation, a bad artifact one file. Once admitted, a run completes and healthy verdicts ship; only a refused admission or a failed `lake build` ends it early.
 
 **Structured property**:
-A property the emitter could express as a plain `Prop` (binders as `ballIco` or `∀` heads, guards as `= pure true` hypotheses, an equation or boolean-island conclusion). An obligation emitted without a payload verdicts as `NotTried` — degradation, not rejection.
+A property expressible as a plain `Prop`: `ballIco` or `∀` binders, guards as `= pure true` hypotheses, an equation or boolean conclusion. An obligation without one verdicts `NotTried`.
 
 **Verdict corpus**:
-The end-to-end fixture suite under `tests/conformance/`: `.ts` fixtures in buckets named for SZS statuses, where bucket membership is the entire specification — every annotation in a fixture must receive its bucket's status. A capability upgrade shows up as a `git mv` between buckets, never as an expectation edit.
-_Avoid_: "conformance harness" (the retired compiler's whole-file corpus)
+`tests/conformance/`: `.ts` fixtures bucketed by SZS status, where the bucket is the whole specification — every annotation in a fixture must get its bucket's status. A capability gain is a `git mv` between buckets, never an expectation edit.
 
-### Flagged ambiguities
-
-- **"Compiler"** — colloquially still used for the engine. The old whole-file TS-to-Lean compiler is gone; today the closest thing is the _emitter_, which checks what it can model and classifies the rest rather than lowering everything. When precision matters, say emitter (the frontend) or prover (the Lean side).
-- **"Conformance"** — `tests/conformance/` now holds the _verdict corpus_, which defines the prove pipeline's correctness by SZS bucket; in notes older than the rebuild, "conformance" means the retired compiler's whole-file corpus instead. The operative checks today are the verdict-channel and envelope scripts, the root prove e2e, and the verdict corpus.
-- **"Verdict" vs "envelope entry"** — a verdict is the engine-side JSON line; the envelope entry is the CLI-side per-annotation record after joining (which adds `InputError` entries the engine never sees). The engine emits verdicts, never envelopes.
+**Emitter vs prover**:
+The emitter is lemma's front-end pass; the prover is the Lean side (`ThalesDsl`). "Compiler" is loose usage for either.
