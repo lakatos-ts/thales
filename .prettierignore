@@ -25,3 +25,7 @@ Test/Tarski/fixtures/
 test262/expected.json
 test262/results.json
 test262/results.md
+
+# agent instructions: column-aligned tables pad every row to the widest
+# cell, and this file is loaded into context every session
+CLAUDE.md
