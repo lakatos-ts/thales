@@ -67,11 +67,13 @@ jobs:
           echo "toolchain=$latest" >> "$GITHUB_OUTPUT"
 
       # The tests are the one target CI builds beyond the default; a removed constant in a test
-      # file is as much a break as one in the library.
+      # file is as much a break as one in the library. `shell: bash` runs with pipefail, so a
+      # failing `lake build` fails the step rather than reporting `tee`'s status.
       - name: Build thales
         id: build
         if: steps.resolve.outputs.changed == 'true'
         continue-on-error: true
+        shell: bash
         run: |
           lake build 2>&1 | tee "$RUNNER_TEMP/thales-build.log"
           lake build Test 2>&1 | tee -a "$RUNNER_TEMP/thales-build.log"
