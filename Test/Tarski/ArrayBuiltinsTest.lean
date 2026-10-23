@@ -10,7 +10,8 @@ own example.
 `reduce`, `flat`, `sort`, and the two statics. This file is the rest of
 23.1.3: `toString`, `toLocaleString`, `at`, `concat`, `copyWithin`,
 `fill`, `includes`, `indexOf`, `lastIndexOf`, `pop`, `reverse`, `shift`,
-`slice`, `splice`, and `unshift`.
+`slice`, `splice`, and `unshift`, and ES2023's four change-by-copy
+members, `toReversed`, `toSorted`, `toSpliced`, and `with`.
 
 **Every one of them is generic over an array-like**, which is what the
 plain-object cases below pin: ToObject on the receiver,
@@ -412,9 +413,9 @@ keys and `Array.prototype` has none. -/
     (expr (callOn (.call (.member (.ident "Object") "getOwnPropertyNames")
       [.member (.ident "Array") "prototype"]) "join" []))
   == ("length,at,concat,constructor,copyWithin,entries,every,fill,filter,find,findIndex," ++
-      "flat,flatMap,forEach,includes,indexOf,join,keys,lastIndexOf,map,pop,push,reduce," ++
-      "reduceRight,reverse,shift,slice,some,sort,splice,toLocaleString,toString,unshift," ++
-      "values")
+      "findLast,findLastIndex,flat,flatMap,forEach,includes,indexOf,join,keys,lastIndexOf," ++
+      "map,pop,push,reduce,reduceRight,reverse,shift,slice,some,sort,splice,toLocaleString," ++
+      "toReversed,toSorted,toSpliced,toString,unshift,values,with")
 
 -- ToObject is the first step of every one of them, so a nullish receiver
 -- is its refusal.
@@ -424,3 +425,142 @@ keys and `Array.prototype` has none. -/
 -- through its index keys, as 23.1.3's generic members have it.
 #guard outcome (expr (.call (.member (protoCall "slice" [.strLit "ab"]) "join") []))
   == "a,b"
+
+/-! ## `toReversed`, `toSorted`, `toSpliced`, and `with`
+
+The four change-by-copy members (23.1.3.34, .35, .36, .39) are
+`reverse`, `sort`, `splice`, and an index write made into a **fresh
+array** rather than into the receiver. Three things are the same in all
+four and are pinned once each here: the receiver is untouched; the
+result is made by ArrayCreate, never ArraySpeciesCreate, so a subclass
+gets a plain `Array`; and every element is read through `Get` with no
+HasProperty in front of it, so a hole arrives as `undefined` — an own
+property of the result — rather than staying one. -/
+
+/-- `class A extends Array {}` -/
+private def declareA : Stmt :=
+  .classDecl "A" { name := some "A", superClass := some (.ident "Array"), elements := [] }
+
+/-- `Array(2)` with `0` written: one element and one hole. -/
+private def oneHole : List Stmt :=
+  [ .varDecl .«const» [{ target := "xs", init := some (.call (.ident "Array") [.numLit 2.0]) }],
+    .exprStmt (.assign (.index (.ident "xs") (.numLit 0.0)) (.numLit 1.0)) ]
+
+#guard outcome (expr (callOn (callOn (nums [1.0, 2.0, 3.0]) "toReversed" []) "join" []))
+  == "3,2,1"
+#guard outcome
+    [ .varDecl .«const» [{ target := "xs", init := some (nums [1.0, 2.0]) }],
+      .exprStmt (callOn (.ident "xs") "toReversed" []),
+      .exprStmt (callOn (.ident "xs") "join" []) ]
+  == "1,2"
+#guard outcome
+    (oneHole ++
+      [ .exprStmt (callOn (callOn (.ident "xs") "toReversed" []) "hasOwnProperty" [.numLit 0.0]) ])
+  == "true"
+#guard outcome
+    [ declareA,
+      .exprStmt (.binary .instanceof
+        (callOn (.new (.ident "A") [.numLit 1.0]) "toReversed" []) (.ident "A")) ]
+  == "false"
+#guard outcome (expr (callOn (protoCall "toReversed" [arrayLike]) "join" [])) == "b,a"
+
+-- `toSorted`: `sort`'s ordering — strings without a comparator, the
+-- comparator's answer with one, `undefined` last — into a fresh array.
+#guard outcome (expr (callOn (callOn (nums [10.0, 9.0, 1.0]) "toSorted" []) "join" []))
+  == "1,10,9"
+#guard outcome
+    (expr (callOn (callOn (nums [10.0, 9.0, 1.0]) "toSorted" [comparator]) "join" []))
+  == "1,9,10"
+#guard outcome
+    [ .varDecl .«const» [{ target := "xs", init := some (nums [3.0, 1.0, 2.0]) }],
+      .exprStmt (callOn (.ident "xs") "toSorted" []),
+      .exprStmt (callOn (.ident "xs") "join" []) ]
+  == "3,1,2"
+-- The comparator is checked first, ahead of ToObject, as `sort`'s is.
+#guard outcome (expr (protoCall "toSorted" [.undefLit, .numLit 1.0]))
+  == "uncaught: TypeError: The comparison function must be either a function or undefined"
+-- A hole is `undefined`, which sorts last and is an own property of the
+-- result, where `sort` would have deleted it.
+#guard outcome
+    (oneHole ++
+      [ .exprStmt (callOn (callOn (.ident "xs") "toSorted" []) "hasOwnProperty" [.numLit 1.0]) ])
+  == "true"
+#guard outcome
+    [ declareA,
+      .exprStmt (.binary .instanceof
+        (callOn (.new (.ident "A") [.numLit 1.0]) "toSorted" []) (.ident "A")) ]
+  == "false"
+#guard outcome (expr (callOn (protoCall "toSorted" [arrayLike]) "join" [])) == "a,b"
+
+-- `toSpliced`: `splice`'s arguments, the three absences told apart as
+-- there — no `start` is no deletion, no `deleteCount` is the whole tail,
+-- and an `undefined` one is 0.
+#guard outcome
+    (expr (callOn (callOn (nums [1.0, 2.0, 3.0]) "toSpliced" [.numLit 1.0, .numLit 1.0]) "join" []))
+  == "1,3"
+#guard outcome
+    (expr (callOn (callOn (nums [1.0, 2.0, 3.0]) "toSpliced"
+      [.numLit 1.0, .numLit 1.0, .numLit 9.0, .numLit 8.0]) "join" []))
+  == "1,9,8,3"
+#guard outcome (expr (callOn (callOn (nums [1.0, 2.0, 3.0]) "toSpliced" [.numLit 1.0]) "join" []))
+  == "1"
+#guard outcome
+    (expr (callOn (callOn (nums [1.0, 2.0, 3.0]) "toSpliced" [.numLit 1.0, .undefLit]) "join" []))
+  == "1,2,3"
+#guard outcome (expr (callOn (callOn (nums [1.0, 2.0, 3.0]) "toSpliced" []) "join" []))
+  == "1,2,3"
+-- A negative `start` counts from the end, and the count is clamped to
+-- what is there.
+#guard outcome
+    (expr (callOn (callOn (nums [1.0, 2.0, 3.0]) "toSpliced" [.numLit (-1.0), .numLit 5.0])
+      "join" []))
+  == "1,2"
+#guard outcome
+    [ .varDecl .«const» [{ target := "xs", init := some (nums [1.0, 2.0, 3.0]) }],
+      .exprStmt (callOn (.ident "xs") "toSpliced" [.numLit 0.0, .numLit 3.0]),
+      .exprStmt (callOn (.ident "xs") "join" []) ]
+  == "1,2,3"
+#guard outcome
+    (oneHole ++
+      [ .exprStmt (callOn (callOn (.ident "xs") "toSpliced" [.numLit 0.0, .numLit 0.0])
+        "hasOwnProperty" [.numLit 1.0]) ])
+  == "true"
+#guard outcome
+    [ declareA,
+      .exprStmt (.binary .instanceof
+        (callOn (.new (.ident "A") [.numLit 1.0]) "toSpliced" []) (.ident "A")) ]
+  == "false"
+#guard outcome (expr (callOn (protoCall "toSpliced" [arrayLike, .numLit 1.0]) "join" [])) == "a"
+
+-- `with`: a relative index, but one outside the array is a `RangeError`
+-- rather than a clamp, and the element it replaces is never read.
+#guard outcome
+    (expr (callOn (callOn (nums [1.0, 2.0, 3.0]) "with" [.numLit 1.0, .numLit 9.0]) "join" []))
+  == "1,9,3"
+#guard outcome
+    (expr (callOn (callOn (nums [1.0, 2.0, 3.0]) "with" [.numLit (-1.0), .numLit 9.0]) "join" []))
+  == "1,2,9"
+#guard outcome (expr (callOn (nums [1.0, 2.0, 3.0]) "with" [.numLit 3.0, .numLit 9.0]))
+  == "uncaught: RangeError: Invalid index"
+#guard outcome (expr (callOn (nums [1.0, 2.0, 3.0]) "with" [.numLit (-4.0), .numLit 9.0]))
+  == "uncaught: RangeError: Invalid index"
+#guard outcome (expr (callOn (.arrayLit []) "with" [.numLit 0.0, .numLit 9.0]))
+  == "uncaught: RangeError: Invalid index"
+#guard outcome
+    [ .varDecl .«const» [{ target := "xs", init := some (nums [1.0, 2.0, 3.0]) }],
+      .exprStmt (callOn (.ident "xs") "with" [.numLit 0.0, .numLit 9.0]),
+      .exprStmt (callOn (.ident "xs") "join" []) ]
+  == "1,2,3"
+#guard outcome
+    (oneHole ++
+      [ .exprStmt (callOn (callOn (.ident "xs") "with" [.numLit 0.0, .numLit 9.0])
+        "hasOwnProperty" [.numLit 1.0]) ])
+  == "true"
+#guard outcome
+    [ declareA,
+      .exprStmt (.binary .instanceof
+        (callOn (.new (.ident "A") [.numLit 1.0]) "with" [.numLit 0.0, .numLit 9.0])
+        (.ident "A")) ]
+  == "false"
+#guard outcome (expr (callOn (protoCall "with" [arrayLike, .numLit 0.0, .strLit "c"]) "join" []))
+  == "c,b"

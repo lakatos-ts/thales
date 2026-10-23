@@ -16,7 +16,7 @@ open Tarski
 /-! ## The shape -/
 
 #guard Heap.initial.cells.size == 39
-#guard Heap.initial.objects.size == 188
+#guard Heap.initial.objects.size == 194
 
 /-! ## Each kind's prototype
 
@@ -285,6 +285,8 @@ explicit about and `Array.isArray(Array.prototype)` observes. -/
   Key.str "filter",
   Key.str "find",
   Key.str "findIndex",
+  Key.str "findLast",
+  Key.str "findLastIndex",
   Key.str "flat",
   Key.str "flatMap",
   Key.str "forEach",
@@ -305,9 +307,13 @@ explicit about and `Array.isArray(Array.prototype)` observes. -/
   Key.str "sort",
   Key.str "splice",
   Key.str "toLocaleString",
+  Key.str "toReversed",
+  Key.str "toSorted",
+  Key.str "toSpliced",
   Key.str "toString",
   Key.str "unshift",
   Key.str "values",
+  Key.str "with",
   WellKnownSymbol.iterator.key ] : List Key)
 
 #guard match Heap.initial.readObj arrayCtorRef with
@@ -323,8 +329,9 @@ explicit about and `Array.isArray(Array.prototype)` observes. -/
 
 /-! ## The rest of the `Array` surface
 
-Each of the twenty-nine references 23.1.2 and 23.1.3 add is its own
-native, under its own name, with 17.1's `length`. -/
+Each of the thirty-five references 23.1.2 and 23.1.3 add is its own
+native, under its own name, with 17.1's `length` — the six ES2023
+members among them, laid out after everything that came before. -/
 
 #guard [ (arrayFromRef, (NativeFn.arrayFrom, "from", 1)),
          (arrayOfRef, (NativeFn.arrayOf, "of", 0)),
@@ -354,7 +361,13 @@ native, under its own name, with 17.1's `length`. -/
          (arraySpliceRef, (NativeFn.arraySplice, "splice", 2)),
          (arrayToLocaleStringRef, (NativeFn.arrayToLocaleString, "toLocaleString", 0)),
          (arrayToStringRef, (NativeFn.arrayToString, "toString", 0)),
-         (arrayUnshiftRef, (NativeFn.arrayUnshift, "unshift", 1)) ].all fun p =>
+         (arrayUnshiftRef, (NativeFn.arrayUnshift, "unshift", 1)),
+         (arrayFindLastRef, (NativeFn.arrayFindLast, "findLast", 1)),
+         (arrayFindLastIndexRef, (NativeFn.arrayFindLastIndex, "findLastIndex", 1)),
+         (arrayToReversedRef, (NativeFn.arrayToReversed, "toReversed", 0)),
+         (arrayToSortedRef, (NativeFn.arrayToSorted, "toSorted", 1)),
+         (arrayToSplicedRef, (NativeFn.arrayToSpliced, "toSpliced", 2)),
+         (arrayWithRef, (NativeFn.arrayWith, "with", 2)) ].all fun p =>
   match Heap.initial.readObj p.1 with
   | some o =>
     (match o.callable with

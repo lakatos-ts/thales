@@ -70,8 +70,9 @@ the literal against the constants so the two cannot drift apart.
 | 158–184   | `Array.prototype.at`, `concat`, `copyWithin`, `every`, `fill`, `filter`, `find`, `findIndex`, `flat`, `flatMap`, `forEach`, `includes`, `indexOf`, `lastIndexOf`, `map`, `pop`, `reduce`, `reduceRight`, `reverse`, `shift`, `slice`, `some`, `sort`, `splice`, `toLocaleString`, `toString`, `unshift` |
 | 185       | `get Array[@@species]`                                    |
 | 186–187   | `isNaN`, `isFinite`, the global predicates                |
+| 188–193   | `Array.prototype.findLast`, `findLastIndex`, `toReversed`, `toSorted`, `toSpliced`, `with` — ES2023's six, after everything that came before |
 
-A hundred and eighty-eight objects, then, and thirty-nine cells. The
+A hundred and ninety-four objects, then, and thirty-nine cells. The
 first twenty-four global bindings are cells 0–23: the seven `Error`
 constructors, then `Object`, `Array`, `String`, `print`, `$262`,
 `Number`, `Boolean`, `Math`, `NaN`, `Infinity`, `parseFloat`,
@@ -727,6 +728,24 @@ def isNaNRef : Ref := 186
 /-- The global `isFinite` (19.2.2), likewise. -/
 def isFiniteRef : Ref := 187
 
+/-- `Array.prototype.findLast`. -/
+def arrayFindLastRef : Ref := 188
+
+/-- `Array.prototype.findLastIndex`. -/
+def arrayFindLastIndexRef : Ref := 189
+
+/-- `Array.prototype.toReversed`. -/
+def arrayToReversedRef : Ref := 190
+
+/-- `Array.prototype.toSorted`. -/
+def arrayToSortedRef : Ref := 191
+
+/-- `Array.prototype.toSpliced`. -/
+def arrayToSplicedRef : Ref := 192
+
+/-- `Array.prototype.with`. -/
+def arrayWithRef : Ref := 193
+
 /-- A built-in function object with extra own properties after its
 `length` and `name`: 17.1's shape, which is what makes
 `Object.getOwnPropertyNames(Object)` start `["length", "name",
@@ -1101,6 +1120,8 @@ def Heap.initial : Heap where
              (Key.str "filter", Property.method (.obj 163)),
              (Key.str "find", Property.method (.obj 164)),
              (Key.str "findIndex", Property.method (.obj 165)),
+             (Key.str "findLast", Property.method (.obj 188)),
+             (Key.str "findLastIndex", Property.method (.obj 189)),
              (Key.str "flat", Property.method (.obj 166)),
              (Key.str "flatMap", Property.method (.obj 167)),
              (Key.str "forEach", Property.method (.obj 168)),
@@ -1121,9 +1142,13 @@ def Heap.initial : Heap where
              (Key.str "sort", Property.method (.obj 180)),
              (Key.str "splice", Property.method (.obj 181)),
              (Key.str "toLocaleString", Property.method (.obj 182)),
+             (Key.str "toReversed", Property.method (.obj 190)),
+             (Key.str "toSorted", Property.method (.obj 191)),
+             (Key.str "toSpliced", Property.method (.obj 192)),
              (Key.str "toString", Property.method (.obj 183)),
              (Key.str "unshift", Property.method (.obj 184)),
              (Key.str "values", Property.method (.obj 149)),
+             (Key.str "with", Property.method (.obj 193)),
              (WellKnownSymbol.iterator.key, Property.method (.obj 149)) ],
          kind := .array 0 true },
        -- 21: Array. `@@species` (23.1.2.5) is an accessor with no
@@ -1680,6 +1705,18 @@ def Heap.initial : Heap where
        -- 186: the global isNaN
        Obj.builtin .globalIsNaN "isNaN" 1,
        -- 187: the global isFinite
-       Obj.builtin .globalIsFinite "isFinite" 1 ]
+       Obj.builtin .globalIsFinite "isFinite" 1,
+       -- 188: Array.prototype.findLast
+       Obj.builtin .arrayFindLast "findLast" 1,
+       -- 189: Array.prototype.findLastIndex
+       Obj.builtin .arrayFindLastIndex "findLastIndex" 1,
+       -- 190: Array.prototype.toReversed
+       Obj.builtin .arrayToReversed "toReversed" 0,
+       -- 191: Array.prototype.toSorted
+       Obj.builtin .arrayToSorted "toSorted" 1,
+       -- 192: Array.prototype.toSpliced
+       Obj.builtin .arrayToSpliced "toSpliced" 2,
+       -- 193: Array.prototype.with
+       Obj.builtin .arrayWith "with" 2 ]
 
 end Tarski

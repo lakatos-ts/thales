@@ -1205,4 +1205,16 @@ is the equation a proof unfolding one step reaches for. -/
 
 /-- info: true -/
 #guard_msgs in
+#eval onlyStandard ``Tarski.findLastFrom.eq_def
+
+/-- info: true -/
+#guard_msgs in
+#eval onlyStandard ``Tarski.copyThrough.eq_def
+
+/-- info: true -/
+#guard_msgs in
+#eval onlyStandard ``Tarski.reverseInto.eq_def
+
+/-- info: true -/
+#guard_msgs in
 #eval onlyStandard ``Tarski.fromArrayLike.eq_def

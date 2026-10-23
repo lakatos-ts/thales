@@ -97,7 +97,7 @@ private def simprocIn (n : Name) : CoreM Bool := do
 -- recurses on a length or a list the heap named, which is a loop by
 -- another spelling, so none of them is a plain unfolding either;
 -- `callArrayNative` is out for `callReflectNative`'s reason, its
--- twenty-nine arms being past the depth at which Lean generates a
+-- thirty-five arms being past the depth at which Lean generates a
 -- match's equation lemmas.
 /-- info: false -/
 #guard_msgs in
@@ -108,7 +108,8 @@ private def simprocIn (n : Name) : CoreM Bool := do
   ``Tarski.reverseFrom, ``Tarski.copyElements, ``Tarski.moveElements,
   ``Tarski.deleteFrom, ``Tarski.flattenInto, ``Tarski.toLocaleStringFrom,
   ``Tarski.collectPresent, ``Tarski.mergeSortValues,
-  ``Tarski.mergeValues, ``Tarski.fromArrayLike].anyM unfoldsIn)
+  ``Tarski.mergeValues, ``Tarski.fromArrayLike, ``Tarski.findLastFrom,
+  ``Tarski.copyThrough, ``Tarski.reverseInto].anyM unfoldsIn)
 
 -- The four heap recursions are in the set, as simprocs.
 /-- info: true -/
