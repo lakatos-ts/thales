@@ -70,7 +70,7 @@ left are filed rather than classified under a closed issue — #531,
 `%IteratorPrototype%` carrying no `@@toStringTag` — and #533 is the
 destructuring evaluation order the two order tests see.
 
-The 1,474 failures below, by owner: 1,033 what #376 excludes (`eval`,
+The 1,456 failures below, by owner: 1,033 what #376 excludes (`eval`,
 `Date`, `RegExp`, `Proxy`, `Reflect`, typed arrays, the keyed
 collections, explicit resource management, the `Iterator` constructor and
 its helpers, `Error.prototype.stack`, `JSON.rawJSON` and the reviver's
@@ -78,13 +78,29 @@ source text, `Array.fromAsync`, the `Function` constructor's semantics,
 `nativeFunctionMatcher.js`, which matches source text with a regular
 expression, and the `nonextensible-applies-to-private` proposal), 197 the
 global object (#487), 151 the transcendental `Math`
-members (#434), 18 ToLength of an infinite `length` (#514), 16 the Unicode character database (#518), 14
+members (#434), 16 the Unicode character database (#518), 14
 `Array.from` over an iterable (#531), 10
 the `@@split`, `@@replace`, and `@@match` lookups the `String` methods
 skip (#523), 5 `Array.prototype[@@unscopables]` (#524), 5 `Math.random`
 (#445), 2 `%IteratorPrototype%`'s `@@toStringTag` (#532), and 23 the ten
 filed defects (#436, #460, #476, #496, #499, #512, #516, #520, #522, and
 #533).
+
+**`Math.clz32` and `Math.imul` moved 15 tests from fail to pass** (#16
+in this repository, #440 before it) in their own two directories and
+nowhere else: both are now all pass. Thirteen waited on ToUint32; the
+other two were each directory's `not-a-constructor.js`, classified under
+`isConstructor.js`, which like the ES2023 six was the member's absence
+all along.
+
+**ToLength of an infinite `length` moved 18 tests from fail to pass**
+(#57 in this repository, #514 before it) in nine `Array.prototype`
+directories and nowhere else: `+∞` is now `2^53 - 1` and `-∞` is `+0`, so
+the `clamps-to-integer-limit` and `throws-if-integer-limit-exceeded` rows
+of `pop`, `push`, `splice`, and `unshift`, the `length-boundaries` row of
+`includes`, and the `length: Infinity` rows of `every`, `some`, `indexOf`,
+and `map` pass. `Function.prototype.apply` over such a `length` refuses
+with a `RangeError` rather than walking it.
 
 **The six ES2023 `Array.prototype` members moved 116 tests from fail to
 pass** in their own six directories and nowhere else: `findLast`,
@@ -100,13 +116,6 @@ still fail are `callbackfn-resize-arraybuffer.js`, which is typed arrays
 `Get` into a fresh array made by ArrayCreate — a hole arrives as
 `undefined` and a subclass gets a plain `Array` — and `with` refuses an
 index outside the array with a `RangeError` where `at` would clamp.
-
-**`Math.clz32` and `Math.imul` moved 15 tests from fail to pass** (#16
-in this repository, #440 before it) in their own two directories and
-nowhere else: both are now all pass. Thirteen waited on ToUint32; the
-other two were each directory's `not-a-constructor.js`, classified under
-`isConstructor.js`, which like the ES2023 six was the member's absence
-all along.
 
 **The global `isNaN` and `isFinite` moved 69 tests from fail to pass**
 across thirteen directories — the arithmetic operators, `unary-plus` and
@@ -196,14 +205,13 @@ nothing else — and the four `Array.prototype` iterator members 28 and 0.
 String iterator cleared `String/prototype/Symbol.iterator` to 6 pass and
 0 fail.
 
-**The forty-eight `Array` directories #390 added are 2,700 pass and 150
+**The forty-eight `Array` directories #390 added are 2,718 pass and 132
 fail**, with 108 unsupported and 124 not run — 88 `async`
 `Array.fromAsync` tests and 36 `noStrict` ones, neither of which this
-epic runs. Not one of the 150 is a member of `Array.prototype` answering
+epic runs. Not one of the 132 is a member of `Array.prototype` answering
 the wrong thing: 101 are what #376 excludes, `Proxy`, `Date`,
 regular expressions, typed arrays, `isConstructor.js`, `eval`,
-`Array.fromAsync`, and `Reflect` among them; 18 are ToLength of an
-infinite `length` (#514); 14 are `Array.from` never asking for
+`Array.fromAsync`, and `Reflect` among them; 14 are `Array.from` never asking for
 `@@iterator` (#531); 7 are the global object (#487); 5 are
 `Array.prototype[@@unscopables]` (#524); 2 are ArraySetLength's double
 coercion (#520); 2 are the
@@ -282,7 +290,6 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Array/prototype/copyWithin`                           | 2     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
 | `test/built-ins/Array/prototype/every`                                | 3     | out-of-scope | `Date` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/every`                                | 3     | out-of-scope | regular expressions are excluded by the epic                                                                        | #376  |
-| `test/built-ins/Array/prototype/every`                                | 2     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
 | `test/built-ins/Array/prototype/every`                                | 1     | builtin      | there is no global object, so a top-level `this` is `undefined`                                                     | #487  |
 | `test/built-ins/Array/prototype/every`                                | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/every`                                | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
@@ -303,9 +310,7 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Array/prototype/forEach`                              | 2     | out-of-scope | regular expressions are excluded by the epic                                                                        | #376  |
 | `test/built-ins/Array/prototype/forEach`                              | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/forEach`                              | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
-| `test/built-ins/Array/prototype/includes`                             | 1     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
 | `test/built-ins/Array/prototype/includes`                             | 1     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
-| `test/built-ins/Array/prototype/indexOf`                              | 2     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
 | `test/built-ins/Array/prototype/indexOf`                              | 1     | bug          | a literal that overflows to `Infinity` reaches Lean as JSON `null`                                                  | #460  |
 | `test/built-ins/Array/prototype/indexOf`                              | 1     | out-of-scope | `Date` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/indexOf`                              | 1     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
@@ -316,13 +321,10 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Array/prototype/lastIndexOf`                          | 1     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
 | `test/built-ins/Array/prototype/lastIndexOf`                          | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/map`                                  | 3     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
-| `test/built-ins/Array/prototype/map`                                  | 2     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
 | `test/built-ins/Array/prototype/map`                                  | 2     | out-of-scope | `Date` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/map`                                  | 2     | out-of-scope | regular expressions are excluded by the epic                                                                        | #376  |
 | `test/built-ins/Array/prototype/map`                                  | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/map`                                  | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
-| `test/built-ins/Array/prototype/pop`                                  | 2     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
-| `test/built-ins/Array/prototype/push`                                 | 3     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
 | `test/built-ins/Array/prototype/reduce`                               | 2     | out-of-scope | `Date` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/reduce`                               | 2     | out-of-scope | regular expressions are excluded by the epic                                                                        | #376  |
 | `test/built-ins/Array/prototype/reduce`                               | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
@@ -333,13 +335,10 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Array/prototype/slice`                                | 4     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
 | `test/built-ins/Array/prototype/some`                                 | 3     | out-of-scope | `Date` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/some`                                 | 3     | out-of-scope | regular expressions are excluded by the epic                                                                        | #376  |
-| `test/built-ins/Array/prototype/some`                                 | 2     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
 | `test/built-ins/Array/prototype/some`                                 | 1     | builtin      | there is no global object, so a top-level `this` is `undefined`                                                     | #487  |
 | `test/built-ins/Array/prototype/some`                                 | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/some`                                 | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
 | `test/built-ins/Array/prototype/splice`                               | 5     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
-| `test/built-ins/Array/prototype/splice`                               | 2     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
-| `test/built-ins/Array/prototype/unshift`                              | 2     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
 | `test/built-ins/ArrayIteratorPrototype/next`                          | 9     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
 | `test/built-ins/Boolean`                                              | 1     | builtin      | there is no global object                                                                                           | #487  |
 | `test/built-ins/Boolean`                                              | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |

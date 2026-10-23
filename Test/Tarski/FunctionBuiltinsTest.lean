@@ -133,6 +133,16 @@ private def plus : Expr :=
     "call" [.objectLit []]))
   == ("uncaught: TypeError: Function.prototype.apply was called on [object Object], " ++
       "which is not a function")
+-- CreateListFromArrayLike over a `length` that is 2^32 or more — an
+-- infinite one among them, ToLength answering 2^53 - 1 — refuses before
+-- reading an element, as an engine does: no argument list is longer than
+-- an array.
+#guard outcome
+    (expr (invoke plus "apply" [.undefLit, .objectLit [.init "length" (.ident "Infinity")]]))
+  == "uncaught: RangeError: Invalid array length"
+#guard outcome
+    (expr (invoke plus "apply" [.undefLit, .objectLit [.init "length" (.numLit 4294967296.0)]]))
+  == "uncaught: RangeError: Invalid array length"
 
 /-! ## `bind`
 

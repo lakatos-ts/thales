@@ -359,6 +359,18 @@ def tsToUint32 (x : Float) : Nat :=
   | none => 0
   | some i => (i.emod 4294967296).toNat
 
+/-- ToLength (7.1.20): ToIntegerOrInfinity clamped into `[0, 2^53 - 1]`.
+The one conversion here that tells the infinities apart — `+∞` is the
+limit itself and `-∞` is `+0` — so it reads the sign off the Number
+rather than off `integerOrInfinity?`'s unsigned `none`. -/
+def tsToLength (x : Float) : Nat :=
+  match x.toModel.unpack with
+  | .infinity .positive => 9007199254740991
+  | _ =>
+    match integerOrInfinity? x with
+    | none => 0
+    | some i => if i ≤ 0 then 0 else min i.toNat 9007199254740991
+
 /-- An integer as the Number it is, exactly below `2^53` and rounded to
 nearest above. It is core's `Float.Model.ofInt`, so it reduces under `decide`
 where an `extern` conversion would not. Library results that are integers

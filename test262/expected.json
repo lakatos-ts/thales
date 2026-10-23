@@ -2942,10 +2942,10 @@
   "test/built-ins/Array/prototype/unshift":
   {"unsupported": 0,
    "timeout": 0,
-   "pass": 20,
+   "pass": 22,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 2},
+   "fail": 0},
   "test/built-ins/Array/prototype/toString":
   {"unsupported": 1,
    "timeout": 0,
@@ -2984,10 +2984,10 @@
   "test/built-ins/Array/prototype/splice":
   {"unsupported": 2,
    "timeout": 0,
-   "pass": 72,
+   "pass": 74,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 7},
+   "fail": 5},
   "test/built-ins/Array/prototype/sort":
   {"unsupported": 6,
    "timeout": 0,
@@ -2998,10 +2998,10 @@
   "test/built-ins/Array/prototype/some":
   {"unsupported": 3,
    "timeout": 0,
-   "pass": 201,
+   "pass": 203,
    "notRun": {"raw": 0, "noStrict": 4, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 11},
+   "fail": 9},
   "test/built-ins/Array/prototype/slice":
   {"unsupported": 5,
    "timeout": 0,
@@ -3040,24 +3040,24 @@
   "test/built-ins/Array/prototype/push":
   {"unsupported": 0,
    "timeout": 0,
-   "pass": 21,
+   "pass": 24,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 3},
+   "fail": 0},
   "test/built-ins/Array/prototype/pop":
   {"unsupported": 0,
    "timeout": 0,
-   "pass": 21,
+   "pass": 23,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 2},
+   "fail": 0},
   "test/built-ins/Array/prototype/map":
   {"unsupported": 5,
    "timeout": 0,
-   "pass": 197,
+   "pass": 199,
    "notRun": {"raw": 0, "noStrict": 3, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 11},
+   "fail": 9},
   "test/built-ins/Array/prototype/lastIndexOf":
   {"unsupported": 3,
    "timeout": 0,
@@ -3082,17 +3082,17 @@
   "test/built-ins/Array/prototype/indexOf":
   {"unsupported": 4,
    "timeout": 0,
-   "pass": 190,
+   "pass": 192,
    "notRun": {"raw": 0, "noStrict": 1, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 6},
+   "fail": 4},
   "test/built-ins/Array/prototype/includes":
   {"unsupported": 3,
    "timeout": 0,
-   "pass": 25,
+   "pass": 26,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 2},
+   "fail": 1},
   "test/built-ins/Array/prototype/forEach":
   {"unsupported": 4,
    "timeout": 0,
@@ -3159,10 +3159,10 @@
   "test/built-ins/Array/prototype/every":
   {"unsupported": 6,
    "timeout": 0,
-   "pass": 198,
+   "pass": 200,
    "notRun": {"raw": 0, "noStrict": 3, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 11},
+   "fail": 9},
   "test/built-ins/Array/prototype/entries":
   {"unsupported": 3,
    "timeout": 0,

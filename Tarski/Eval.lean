@@ -192,7 +192,7 @@ new refusal is written against a list rather than invented.
 | `instanceof` a non-callable                        | `TypeError`      | `Right-hand side of 'instanceof' is not callable`            |
 | `instanceof` a function with a non-object prototype | `TypeError`     | `Function has non-object prototype in instanceof check`      |
 | `Error.prototype.toString` on a primitive          | `TypeError`      | `Error.prototype.toString called on non-object`              |
-| `xs.length = v` with a `v` that is not a uint32    | `RangeError`     | `Invalid array length`                                       |
+| `xs.length = v` with a `v` that is not a uint32, or `apply` over an array-like whose `length` is 2^32 or more | `RangeError` | `Invalid array length`                     |
 | `Object.keys` of `undefined` or `null`             | `TypeError`      | `Cannot convert undefined or null to object`                 |
 | `Object(v)` or `hasOwnProperty` on a string primitive | `TypeError`  | `Cannot convert a primitive to an object`                     |
 | `reduce` of an empty array with no initial value    | `TypeError`      | `Reduce of empty array with no initial value`                 |
@@ -3089,20 +3089,19 @@ def constructNative (n : NativeFn) (newTarget : Value) (args : List Value) : Eva
   partial_fixpoint
 
 /-- ToLength (7.1.20) on a value, the length `apply` and every member of
-`Array.prototype` read off an array-like: ToIntegerOrInfinity, then
-**clamped into `[0, 2^53 - 1]`**, which is what makes
+`Array.prototype` read off an array-like: ToNumber — so a user `valueOf`
+runs, once — then the library's `tsToLength`, ToIntegerOrInfinity
+**clamped into `[0, 2^53 - 1]`**. That clamp is what makes
 `push.call({ length: 2 ** 53 })` write `2 ** 53 - 1` back rather than
-refuse.
+refuse, and it puts `+∞` at the limit and `-∞` at `+0`, as the
+specification does.
 
-Either infinity still answers 0, which is a documented limit rather than
-the clamp: `+∞` should be `2^53 - 1` too, but `listFromArrayLike` would
-then build a list of that many values for an `apply`, so the choice there
-is between a wrong answer and a run that never ends, and a wrong answer
-can at least be seen. -/
+A caller that would then *walk* that length has to refuse first, since a
+walk of 2^53 - 1 reads never comes back: every member of `Array.prototype`
+that grows past the limit throws before it writes, and `apply`'s
+CreateListFromArrayLike refuses a `length` that is 2^32 or more. -/
 def toLengthValue (v : Value) : EvalM Nat := do
-  match ← toIntegerOrInfinityValue v with
-  | none => pure 0
-  | some i => pure (if i ≤ 0 then 0 else min i.toNat maxArrayLength)
+  pure (Number.FloatOps.tsToLength (← toNumberValue v))
   partial_fixpoint
 
 /-- LengthOfArrayLike (7.3.19): ToLength of `Get(O, "length")`. An Array
@@ -3906,6 +3905,12 @@ def callReflectNative (f : NativeFn) (thisArg : Value) (args : List Value) : Eva
         | .prim .null => pure []
         | .obj r => do
           let len ← toLengthValue (← getProp (.obj r) "length")
+          -- No argument list is longer than an array: a `length` that
+          -- `arrayCreate` would refuse — an infinite one among them,
+          -- ToLength answering 2^53 - 1 — is refused here too, before an
+          -- element is read, rather than walked. An engine answers the
+          -- same `RangeError`.
+          if 4294967296 ≤ len then throwJsError .rangeError "Invalid array length"
           listFromArrayLike (.obj r) 0 len
         | _ => throwJsError .typeError "CreateListFromArrayLike called on non-object"
       callFunction thisArg (args.headD undefValue) argList
