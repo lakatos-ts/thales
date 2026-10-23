@@ -211,6 +211,23 @@ private def pushOnPlainObject (tail : Expr) : Program :=
       .exprStmt (.call (.member (.ident "o") "push") [.numLit 1.0]) ]
   == "uncaught: TypeError: Array length exceeds 2**53 - 1"
 
+-- ToLength (7.1.20) of `+∞` is 2^53 - 1, so an infinite `length` is at
+-- the limit and refuses the same way; `-∞` is `+0`, and the element lands
+-- at `0`.
+#guard outcome
+    [ .varDecl .«const» [{ target := "o", init := some (.objectLit
+        [.init "length" (.ident "Infinity")]) }],
+      .exprStmt (.call (.member (.member (.member (.ident "Array") "prototype") "push") "call")
+        [.ident "o", .numLit 1.0]) ]
+  == "uncaught: TypeError: Array length exceeds 2**53 - 1"
+#guard outcome
+    [ .varDecl .«const» [{ target := "o", init := some (.objectLit
+        [.init "length" (.unary .neg (.ident "Infinity"))]) }],
+      .exprStmt (.call (.member (.member (.member (.ident "Array") "prototype") "push") "call")
+        [.ident "o", .numLit 1.0]),
+      .exprStmt (.index (.ident "o") (.numLit 0.0)) ]
+  == "1"
+
 -- The final `length` write is observable: a frozen array refuses a
 -- zero-argument `push`, which an engine does too.
 #guard outcome

@@ -57,3 +57,27 @@ example : integerOrInfinity? 100.0 = some 100 := by decide
 -- The magnitude is exact at every size: this is a hundred quintillion, not a
 -- saturated `UInt64`.
 #guard integerOrInfinity? 1e20 == some 100000000000000000000
+
+/-! ## ToLength, 7.1.20
+
+ToIntegerOrInfinity clamped into `[0, 2^53 - 1]`. This is the one
+conversion that tells the infinities apart: `+∞` is the limit itself and
+`-∞` is `+0`, as test262's `clamps-to-integer-limit` rows for `pop`,
+`push`, `splice`, and `unshift` observe through the `length` written back. -/
+
+example : tsToLength Js.floatNaN = 0 := by decide
+example : tsToLength (-0.0) = 0 := by decide
+example : tsToLength (-1.0) = 0 := by decide
+example : tsToLength (-Js.floatInf) = 0 := by decide
+example : tsToLength 2.5 = 2 := by decide
+example : tsToLength 9007199254740991.0 = 9007199254740991 := by decide
+example : tsToLength 9007199254740992.0 = 9007199254740991 := by decide
+example : tsToLength Js.floatInf = 9007199254740991 := by decide
+#guard tsToLength Js.floatNaN == 0
+#guard tsToLength (-0.0) == 0
+#guard tsToLength (-1.0) == 0
+#guard tsToLength (-Js.floatInf) == 0
+#guard tsToLength 2.5 == 2
+#guard tsToLength 9007199254740991.0 == 9007199254740991
+#guard tsToLength 9007199254740992.0 == 9007199254740991
+#guard tsToLength Js.floatInf == 9007199254740991
