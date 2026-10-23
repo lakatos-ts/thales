@@ -135,3 +135,9 @@ example : tsImul (-1.0) 8 = -8 := by decide
 #guard tsImul Js.floatInf 7 == 0
 #guard tsImul (-4294967297) 3 == -3
 #guard tsImul 1e20 1 == 1661992960
+
+-- The result is `+0`, never `-0`: `==` cannot see the sign, the bits can.
+example : (tsImul (-0.0) 7).toBits = 0 := by decide
+example : (tsImul (-1.0) 0).toBits = 0 := by decide
+#guard (tsImul (-0.0) 7).toBits == 0
+#guard (tsImul (-1.0) 0).toBits == 0

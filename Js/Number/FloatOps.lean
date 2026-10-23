@@ -352,8 +352,8 @@ def tsToInt32 (x : Float) : Int :=
     if bits ≥ 2147483648 then bits - 4294967296 else bits
 
 /-- ToUint32 (7.1.6): the same truncation as `tsToInt32`, read unsigned.
-`String.prototype.split`'s `limit` is what takes its argument through
-it. -/
+`String.prototype.split`'s `limit` takes its argument through it, and
+`Math.clz32` and `Math.imul` theirs. -/
 def tsToUint32 (x : Float) : Nat :=
   match integerOrInfinity? x with
   | none => 0

@@ -218,6 +218,40 @@ NaN. A fold that coerced lazily would print `a`. -/
 -- `Math.imul(Symbol(), 1);` — ToNumber of a Symbol throws.
 #guard (outcome (expr (math "imul" [.call (.ident "Symbol") [], .numLit 1.0]))).startsWith "uncaught: TypeError"
 
+/-- `{ valueOf() { log += "<tag>"; <last> } }`, an operand whose coercion
+leaves a mark in `log`. -/
+private def loggedValueOf (tag : String) (last : Stmt) : Expr :=
+  .objectLit
+    [ .init "valueOf"
+        (.funcExpr none []
+          [ .exprStmt (.assign (.ident "log")
+              (.binary .add (.ident "log") (.strLit tag))),
+            last ]) ]
+
+/-! `let log = ""; Math.imul({ valueOf… "x" 3 }, { valueOf… "y" 4 }); log;` —
+the operands are coerced left to right. -/
+#guard outcome
+    [ .varDecl .«let» [{ target := "log", init := some (.strLit "") }],
+      .exprStmt (math "imul"
+        [ loggedValueOf "x" (.returnStmt (some (.numLit 3.0))),
+          loggedValueOf "y" (.returnStmt (some (.numLit 4.0))) ]),
+      .exprStmt (.ident "log") ]
+  == "xy"
+
+/-! `let log = ""; try { Math.imul({ valueOf… "x" throw }, { valueOf… "y" 4 }); }
+catch {} log;` — a first operand that throws stops the call before the
+second is coerced. -/
+#guard outcome
+    [ .varDecl .«let» [{ target := "log", init := some (.strLit "") }],
+      .tryStmt
+        [ .exprStmt (math "imul"
+            [ loggedValueOf "x" (.throwStmt (.strLit "stop")),
+              loggedValueOf "y" (.returnStmt (some (.numLit 4.0))) ]) ]
+        (some { param := none, body := [] })
+        none,
+      .exprStmt (.ident "log") ]
+  == "x"
+
 -- `Math.clz32.length;` and `Math.imul.length;`
 #guard outcome (expr (.member (.member (.ident "Math") "clz32") "length")) == "1"
 #guard outcome (expr (.member (.member (.ident "Math") "imul") "length")) == "2"
