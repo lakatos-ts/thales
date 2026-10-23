@@ -361,9 +361,10 @@ def tsToUint32 (x : Float) : Nat :=
 
 /-- An integer as the Number it is, exactly below `2^53` and rounded to
 nearest above. It is core's `Float.Model.ofInt`, so it reduces under `decide`
-where an `extern` conversion would not. This is the library's one
-integer-to-Number widening: `Tarski/` takes it from here rather than spelling
-its own. -/
+where an `extern` conversion would not. Library results that are integers
+widen through it, so an evaluator arm hands back the library's Number and
+converts nothing itself; `Tarski`'s `Value.ofNat` remains the evaluator's own
+widening of a length or an index. -/
 def numberOfInt (i : Int) : Float := Float.ofModel (Float.Model.ofInt i)
 
 /-- The leading zero bits of `m` read as a `k`-bit word: one for each top bit
@@ -381,8 +382,8 @@ def tsClz32 (x : Float) : Float :=
 
 /-- `Math.imul`, 21.3.2.19: the product of the two ToUint32 values modulo
 `2^32`, read signed. The arithmetic is on `Nat`, so the product is exact
-however large the operands, and the result is an integer below `2^31` in
-magnitude: it widens exactly, and is never `-0`. -/
+however large the operands, and the result is an integer in
+`[-2^31, 2^31)`: it widens exactly, and is never `-0`. -/
 def tsImul (x y : Float) : Float :=
   let p := (tsToUint32 x * tsToUint32 y) % 4294967296
   numberOfInt (if p ≥ 2147483648 then (p : Int) - 4294967296 else p)
