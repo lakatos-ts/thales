@@ -247,6 +247,7 @@ attribute [tarski_eval]
   booleanProtoRef booleanCtorRef booleanToStringRef booleanValueOfRef
   mathRef mathAbsRef mathCeilRef mathFloorRef mathFroundRef mathRoundRef
   mathSignRef mathSqrtRef mathTruncRef mathMaxRef mathMinRef mathPowRef
+  mathClz32Ref mathImulRef
   parseFloatRef parseIntRef numberToFixedRef numberToExponentialRef
   numberToPrecisionRef numberToLocaleStringRef throwTypeErrorRef consoleRef consoleLogRef
   functionProtoRef functionCtorRef functionCallRef functionApplyRef functionBindRef

@@ -12,8 +12,8 @@ folding the library's binary operations from the identities its header
 names.
 
 What is *not* here is pinned too. `Math` has no `[[Call]]` and no
-`[[Construct]]`, and the transcendental members, `random`, `clz32`, and
-`imul` are absent rather than faked — a missing member reads `undefined`,
+`[[Construct]]`, and the transcendental members and `random` are absent
+rather than faked — a missing member reads `undefined`,
 which is an honest answer, where a wrong one would not be. `Math.pow` of a
 non-integral exponent is the library's placeholder (#434), and it is
 pinned as such. -/
@@ -189,6 +189,38 @@ NaN. A fold that coerced lazily would print `a`. -/
     (expr (.binary .strictEq (.binary .exponent (.numLit 2.0) (.numLit 53.0))
       (math "pow" [.numLit 2.0, .numLit 53.0])))
   == "true"
+
+/-! ## `Math.clz32` and `Math.imul`, the two integer members -/
+
+-- `Math.clz32(1);`
+#guard outcome (expr (math "clz32" [.numLit 1.0])) == "31"
+
+-- `Math.clz32();` — `undefined` is NaN is +0, so every bit is a leading zero.
+#guard outcome (expr (math "clz32" [])) == "32"
+
+-- `Math.clz32({ valueOf() { return 8; } });` — ToNumber runs user code.
+#guard outcome (expr (math "clz32" [valueOfObj (.numLit 8.0)])) == "28"
+
+-- `Math.imul(0xffffffff, 5);` — the product wraps into the signed range.
+#guard outcome (expr (math "imul" [.numLit 4294967295.0, .numLit 5.0])) == "-5"
+
+-- `Math.imul("3", "4");` — strings coerce.
+#guard outcome (expr (math "imul" [.strLit "3", .strLit "4"])) == "12"
+
+-- `Math.imul(3);` and `Math.imul();` — a missing operand is 0.
+#guard outcome (expr (math "imul" [.numLit 3.0])) == "0"
+#guard outcome (expr (math "imul" [])) == "0"
+
+-- `Object.is(Math.imul(-1, 0), 0);` — the result is never -0.
+#guard outcome (expr (objectIs (math "imul" [.unary .neg (.numLit 1.0), .numLit 0.0]) (.numLit 0.0))) == "true"
+#guard outcome (expr (objectIs (math "imul" [negZero, .numLit 7.0]) (.numLit 0.0))) == "true"
+
+-- `Math.imul(Symbol(), 1);` — ToNumber of a Symbol throws.
+#guard (outcome (expr (math "imul" [.call (.ident "Symbol") [], .numLit 1.0]))).startsWith "uncaught: TypeError"
+
+-- `Math.clz32.length;` and `Math.imul.length;`
+#guard outcome (expr (.member (.member (.ident "Math") "clz32") "length")) == "1"
+#guard outcome (expr (.member (.member (.ident "Math") "imul") "length")) == "2"
 
 /-! ## The constants, each the library's own definition -/
 

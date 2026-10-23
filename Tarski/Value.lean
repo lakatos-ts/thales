@@ -462,6 +462,10 @@ inductive NativeFn where
   | mathMin
   /-- `Math.pow`, the library's `tsPow` — the same definition `**` is. -/
   | mathPow
+  /-- `Math.clz32`, the library's `tsClz32` over ToUint32. -/
+  | mathClz32
+  /-- `Math.imul`, the library's `tsImul` over ToUint32. -/
+  | mathImul
   /-- `%ThrowTypeError%` (10.2.4.1): the one function per realm that does
   nothing but throw a `TypeError`. It is both halves of a strict
   `arguments` object's `callee` accessor, which is why it must be a
