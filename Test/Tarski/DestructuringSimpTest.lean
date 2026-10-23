@@ -26,7 +26,7 @@ by `#eval` here and by `Test/Tarski/DestructuringTest.lean` in full.
 
 Four literals need lemmas of their own, as `Test/Tarski/ArraySimpTest.lean`
 carries its index parse: `Nat.repr`, `Nat.toFloat`, the index parse, and
-ToLength's integer part each close by `decide` and not by `simp`. -/
+ToLength each close by `decide` and not by `simp`. -/
 
 open Tarski
 
@@ -60,7 +60,7 @@ private def issueExample : Program :=
 @[local simp] private theorem arrayIndex_zero : arrayIndex? "0" = some 0 := by decide
 @[local simp] private theorem one_toFloat : (1 : Nat).toFloat = 1.0 := by decide
 @[local simp] private theorem len_one :
-    Js.Number.FloatOps.integerOrInfinity? 1.0 = some 1 := by decide
+    Js.Number.FloatOps.tsToLength 1.0 = 1 := by decide
 
 set_option maxRecDepth 8000 in
 set_option maxHeartbeats 4000000 in

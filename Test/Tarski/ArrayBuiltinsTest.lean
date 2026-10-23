@@ -396,6 +396,46 @@ not the same: an *absent* one takes the whole tail where a *present*
       .exprStmt (callOn (.ident "xs") "hasOwnProperty" [.numLit 1.0]) ]
   == "false"
 
+/-! ## ToLength of an infinite `length`
+
+ToLength (7.1.20) clamps into `[0, 2^53 - 1]`, and an infinity is at one
+end of it: `+∞` is `2^53 - 1` and `-∞` is `+0`. `pop`, `splice`, and
+`unshift` make the clamp observable through the `length` they write back;
+`includes` through the index it reaches. -/
+
+/-- `const o = { length: <len> }; Array.prototype.<name>.call(o<, args>); o.length` -/
+private def lengthAfter (len : Expr) (name : String) (args : List Expr) : Program :=
+  [ .varDecl .«const» [{ target := "o", init := some (.objectLit [.init "length" len]) }],
+    .exprStmt (protoCall name (.ident "o" :: args)),
+    .exprStmt (.member (.ident "o") "length") ]
+
+#guard outcome (lengthAfter (.ident "Infinity") "pop" []) == "9007199254740990"
+#guard outcome (lengthAfter (.unary .neg (.ident "Infinity")) "pop" []) == "0"
+#guard outcome (lengthAfter (.ident "Infinity") "splice" []) == "9007199254740991"
+#guard outcome (lengthAfter (.ident "Infinity") "unshift" []) == "9007199254740991"
+-- `includes` from 2^53 - 2 reaches the last index and no further.
+#guard outcome
+    (expr (protoCall "includes"
+      [ .objectLit [.init "length" (.ident "Infinity"), .init "9007199254740990" (.strLit "c")],
+        .strLit "c", .numLit 9007199254740990.0 ]))
+  == "true"
+#guard outcome
+    (expr (protoCall "includes"
+      [ .objectLit [.init "length" (.ident "Infinity"), .init "9007199254740991" (.strLit "d")],
+        .strLit "d", .numLit 9007199254740990.0 ]))
+  == "false"
+-- `length` is coerced exactly once: a `valueOf` answering `Infinity`
+-- runs one time for `pop`.
+#guard outcome
+    [ .varDecl .«let» [{ target := "n", init := some (.numLit 0.0) }],
+      .varDecl .«const» [{ target := "o", init := some (.objectLit
+        [.init "length" (.objectLit [.init "valueOf" (.arrow [] (.block
+          [ .exprStmt (.assign (.ident "n") (.binary .add (.ident "n") (.numLit 1.0))),
+            .returnStmt (some (.ident "Infinity")) ]))])]) }],
+      .exprStmt (protoCall "pop" [.ident "o"]),
+      .exprStmt (.ident "n") ]
+  == "1"
+
 /-! ## The surface itself
 
 17.1's shape for every one of them, and 23.1.3's order for the prototype
