@@ -2487,10 +2487,10 @@
   "test/built-ins/Math/imul":
   {"unsupported": 0,
    "timeout": 0,
-   "pass": 0,
+   "pass": 5,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 5},
+   "fail": 0},
   "test/built-ins/Math/hypot":
   {"unsupported": 0,
    "timeout": 0,
@@ -2550,10 +2550,10 @@
   "test/built-ins/Math/clz32":
   {"unsupported": 0,
    "timeout": 0,
-   "pass": 0,
+   "pass": 10,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 10},
+   "fail": 0},
   "test/built-ins/Math/ceil":
   {"unsupported": 0,
    "timeout": 0,

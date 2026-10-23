@@ -746,6 +746,12 @@ def arrayToSplicedRef : Ref := 192
 /-- `Array.prototype.with`. -/
 def arrayWithRef : Ref := 193
 
+/-- `Math.clz32`. -/
+def mathClz32Ref : Ref := 194
+
+/-- `Math.imul`. -/
+def mathImulRef : Ref := 195
+
 /-- A built-in function object with extra own properties after its
 `length` and `name`: 17.1's shape, which is what makes
 `Object.getOwnPropertyNames(Object)` start `["length", "name",
@@ -1244,9 +1250,9 @@ def Heap.initial : Heap where
        Obj.builtin .booleanValueOf "valueOf" 0,
        -- 41: Math. No `callable`: `Math()` is `not a function` and
        -- `new Math()` is `not a constructor`. The members are exactly
-       -- the ones the library expresses — the transcendental family,
-       -- `random`, `clz32`, and `imul` are absent rather than faked
-       -- (#434 for the first, ToUint32/ToInt32 for the last two). The
+       -- the ones the library expresses — the transcendental family and
+       -- `random` are absent rather than faked (#434 for the first);
+       -- `clz32` and `imul` are the library's ToUint32 members. The
        -- eight constants have no attribute at all, so `Math.PI = 1` is
        -- the strict-mode refusal it is in an engine.
        { proto := some 15,
@@ -1270,6 +1276,8 @@ def Heap.initial : Heap where
              ("max", Property.method (.obj 50)),
              ("min", Property.method (.obj 51)),
              ("pow", Property.method (.obj 52)),
+             ("clz32", Property.method (.obj 194)),
+             ("imul", Property.method (.obj 195)),
              (WellKnownSymbol.toStringTag.key,
                Property.attribute (.prim (.str "Math"))) ] },
        -- 42: Math.abs
@@ -1717,6 +1725,10 @@ def Heap.initial : Heap where
        -- 192: Array.prototype.toSpliced
        Obj.builtin .arrayToSpliced "toSpliced" 2,
        -- 193: Array.prototype.with
-       Obj.builtin .arrayWith "with" 2 ]
+       Obj.builtin .arrayWith "with" 2,
+       -- 194: Math.clz32
+       Obj.builtin .mathClz32 "clz32" 1,
+       -- 195: Math.imul
+       Obj.builtin .mathImul "imul" 2 ]
 
 end Tarski

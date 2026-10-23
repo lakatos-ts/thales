@@ -16,7 +16,7 @@ open Tarski
 /-! ## The shape -/
 
 #guard Heap.initial.cells.size == 39
-#guard Heap.initial.objects.size == 194
+#guard Heap.initial.objects.size == 196
 
 /-! ## Each kind's prototype
 
@@ -658,8 +658,8 @@ because references and cells are only ever appended. -/
 /-! ## `Math`
 
 No `[[Call]]`: `Math()` is `not a function`. Its members are exactly the
-ones the library expresses — the transcendental family, `random`,
-`clz32`, and `imul` are absent rather than faked. -/
+ones the library expresses — the transcendental family and `random` are
+absent rather than faked. -/
 
 #guard match Heap.initial.readObj mathRef with
   | some o => o.proto == some objectProtoRef && o.callable.isNone
@@ -690,16 +690,21 @@ private def mathMembers : List (String × Ref) :=
     ("trunc", mathTruncRef),
     ("max", mathMaxRef),
     ("min", mathMinRef),
-    ("pow", mathPowRef) ]
+    ("pow", mathPowRef),
+    ("clz32", mathClz32Ref),
+    ("imul", mathImulRef) ]
 
 #guard match Heap.initial.readObj mathRef with
   | some o => mathMembers.all fun p => o.getOwn p.1 == some (.obj p.2)
   | none => false
 
+#guard (Heap.initial.readObj mathClz32Ref).bind (·.getOwn "length") == some (Value.ofNat 1)
+#guard (Heap.initial.readObj mathImulRef).bind (·.getOwn "length") == some (Value.ofNat 2)
+
 #guard match Heap.initial.readObj mathRef with
   | some o =>
     ["cbrt", "random", "hypot", "exp", "log", "log2", "log10", "atan2", "sin", "cos",
-      "clz32", "imul", "f16round", "sumPrecise"].all fun k => o.getOwn k == none
+      "f16round", "sumPrecise"].all fun k => o.getOwn k == none
   | none => false
 
 /-! ## `%TemplateMap%`
@@ -750,6 +755,8 @@ private def nativeAt (r : Ref) (n : NativeFn) : Bool :=
          (mathMaxRef, .mathMax),
          (mathMinRef, .mathMin),
          (mathPowRef, .mathPow),
+         (mathClz32Ref, .mathClz32),
+         (mathImulRef, .mathImul),
          (functionProtoRef, .functionProto),
          (functionCtorRef, .functionCtor),
          (functionCallRef, .functionCall),

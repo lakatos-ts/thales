@@ -70,7 +70,7 @@ left are filed rather than classified under a closed issue — #531,
 `%IteratorPrototype%` carrying no `@@toStringTag` — and #533 is the
 destructuring evaluation order the two order tests see.
 
-The 1,471 failures below, by owner: 1,035 what #376 excludes (`eval`,
+The 1,456 failures below, by owner: 1,033 what #376 excludes (`eval`,
 `Date`, `RegExp`, `Proxy`, `Reflect`, typed arrays, the keyed
 collections, explicit resource management, the `Iterator` constructor and
 its helpers, `Error.prototype.stack`, `JSON.rawJSON` and the reviver's
@@ -79,12 +79,19 @@ source text, `Array.fromAsync`, the `Function` constructor's semantics,
 expression, and the `nonextensible-applies-to-private` proposal), 197 the
 global object (#487), 151 the transcendental `Math`
 members (#434), 16 the Unicode character database (#518), 14
-`Array.from` over an iterable (#531), 13 `Math.clz32`/`imul` (#440), 10
+`Array.from` over an iterable (#531), 10
 the `@@split`, `@@replace`, and `@@match` lookups the `String` methods
 skip (#523), 5 `Array.prototype[@@unscopables]` (#524), 5 `Math.random`
 (#445), 2 `%IteratorPrototype%`'s `@@toStringTag` (#532), and 23 the ten
 filed defects (#436, #460, #476, #496, #499, #512, #516, #520, #522, and
 #533).
+
+**`Math.clz32` and `Math.imul` moved 15 tests from fail to pass** (#16
+in this repository, #440 before it) in their own two directories and
+nowhere else: both are now all pass. Thirteen waited on ToUint32; the
+other two were each directory's `not-a-constructor.js`, classified under
+`isConstructor.js`, which like the ES2023 six was the member's absence
+all along.
 
 **ToLength of an infinite `length` moved 18 tests from fail to pass**
 (#57 in this repository, #514 before it) in nine `Array.prototype`
@@ -380,8 +387,6 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Math/atanh`                                           | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
 | `test/built-ins/Math/cbrt`                                            | 4     | builtin      | the transcendental `Math` members, `sumPrecise`, and `f16round` are absent                                          | #434  |
 | `test/built-ins/Math/cbrt`                                            | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
-| `test/built-ins/Math/clz32`                                           | 9     | builtin      | `Math.clz32` and `Math.imul` need ToInt32 and ToUint32                                                              | #440  |
-| `test/built-ins/Math/clz32`                                           | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
 | `test/built-ins/Math/cos`                                             | 8     | builtin      | the transcendental `Math` members, `sumPrecise`, and `f16round` are absent                                          | #434  |
 | `test/built-ins/Math/cos`                                             | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
 | `test/built-ins/Math/cosh`                                            | 4     | builtin      | the transcendental `Math` members, `sumPrecise`, and `f16round` are absent                                          | #434  |
@@ -394,8 +399,6 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Math/f16round`                                        | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
 | `test/built-ins/Math/hypot`                                           | 11    | builtin      | the transcendental `Math` members, `sumPrecise`, and `f16round` are absent                                          | #434  |
 | `test/built-ins/Math/hypot`                                           | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
-| `test/built-ins/Math/imul`                                            | 4     | builtin      | `Math.clz32` and `Math.imul` need ToInt32 and ToUint32                                                              | #440  |
-| `test/built-ins/Math/imul`                                            | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
 | `test/built-ins/Math/log`                                             | 8     | builtin      | the transcendental `Math` members, `sumPrecise`, and `f16round` are absent                                          | #434  |
 | `test/built-ins/Math/log`                                             | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
 | `test/built-ins/Math/log10`                                           | 4     | builtin      | the transcendental `Math` members, `sumPrecise`, and `f16round` are absent                                          | #434  |

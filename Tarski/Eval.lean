@@ -3616,6 +3616,11 @@ def callNative (f : NativeFn) (thisArg : Value) (args : List Value) : EvalM Valu
     let base ← toNumberValue (args.headD undefValue)
     let exponent ← toNumberValue (args[1]?.getD undefValue)
     pure (.prim (.num (Number.FloatOps.tsPow base exponent)))
+  | .mathClz32 => mathUnary Number.FloatOps.tsClz32 args
+  | .mathImul => do
+    let x ← toNumberValue (args.headD undefValue)
+    let y ← toNumberValue (args[1]?.getD undefValue)
+    pure (.prim (.num (Number.FloatOps.tsImul x y)))
   -- The `Object` and `Function` surface is a definition of its own. It is
   -- not a matter of taste: `NativeFn` has sixty constructors now, and a
   -- `match` over all of them with a body this size is one whose equation

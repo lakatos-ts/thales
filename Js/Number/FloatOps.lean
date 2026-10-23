@@ -352,8 +352,8 @@ def tsToInt32 (x : Float) : Int :=
     if bits ≥ 2147483648 then bits - 4294967296 else bits
 
 /-- ToUint32 (7.1.6): the same truncation as `tsToInt32`, read unsigned.
-`String.prototype.split`'s `limit` is what takes its argument through
-it. -/
+`String.prototype.split`'s `limit` takes its argument through it, and
+`Math.clz32` and `Math.imul` theirs. -/
 def tsToUint32 (x : Float) : Nat :=
   match integerOrInfinity? x with
   | none => 0
@@ -370,6 +370,35 @@ def tsToLength (x : Float) : Nat :=
     match integerOrInfinity? x with
     | none => 0
     | some i => if i ≤ 0 then 0 else min i.toNat 9007199254740991
+
+/-- An integer as the Number it is, exactly below `2^53` and rounded to
+nearest above. It is core's `Float.Model.ofInt`, so it reduces under `decide`
+where an `extern` conversion would not. Library results that are integers
+widen through it, so an evaluator arm hands back the library's Number and
+converts nothing itself; `Tarski`'s `Value.ofNat` remains the evaluator's own
+widening of a length or an index. -/
+def numberOfInt (i : Int) : Float := Float.ofModel (Float.Model.ofInt i)
+
+/-- The leading zero bits of `m` read as a `k`-bit word: one for each top bit
+position `m` falls below. The recursion is on the width, not on `m`, so it is
+structural and `decide` unfolds it; `Nat.log2` is well-founded and would not. -/
+def clzNat : Nat → Nat → Nat
+  | 0, _ => 0
+  | k + 1, m => if m < 2 ^ k then 1 + clzNat k m else 0
+
+/-- `Math.clz32`, 21.3.2.11: the leading zero bits of ToUint32(x) in a 32-bit
+word. A NaN, an infinity, and both zeros are `0` after ToUint32, hence `32`;
+a negative argument wraps first, so `-1` is `0`. -/
+def tsClz32 (x : Float) : Float :=
+  numberOfInt (clzNat 32 (tsToUint32 x))
+
+/-- `Math.imul`, 21.3.2.19: the product of the two ToUint32 values modulo
+`2^32`, read signed. The arithmetic is on `Nat`, so the product is exact
+however large the operands, and the result is an integer in
+`[-2^31, 2^31)`: it widens exactly, and is never `-0`. -/
+def tsImul (x y : Float) : Float :=
+  let p := (tsToUint32 x * tsToUint32 y) % 4294967296
+  numberOfInt (if p ≥ 2147483648 then (p : Int) - 4294967296 else p)
 
 /-- ToUint16 (7.1.7), which is what `String.fromCharCode` converts each
 of its arguments with. -/

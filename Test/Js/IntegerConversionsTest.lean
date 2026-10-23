@@ -81,3 +81,63 @@ example : tsToLength Js.floatInf = 9007199254740991 := by decide
 #guard tsToLength 9007199254740991.0 == 9007199254740991
 #guard tsToLength 9007199254740992.0 == 9007199254740991
 #guard tsToLength Js.floatInf == 9007199254740991
+
+/-! ## `Math.clz32` and `Math.imul`, the two members built on ToUint32 -/
+
+example : tsClz32 0.0 = 32 := by decide
+example : tsClz32 1.0 = 31 := by decide
+example : tsClz32 2147483648 = 0 := by decide
+example : tsImul 2 4 = 8 := by decide
+example : tsImul (-1.0) 8 = -8 := by decide
+
+-- test262 `clz32/int32bit.js`, `nan.js`, `infinity.js`, `Math.clz32.js`
+#guard tsClz32 (-0.0) == 32
+#guard tsClz32 Js.floatNaN == 32
+#guard tsClz32 Js.floatInf == 32
+#guard tsClz32 (-Js.floatInf) == 32
+#guard tsClz32 4294967295 == 0
+#guard tsClz32 4294967296 == 32
+#guard tsClz32 4294967297 == 31
+#guard tsClz32 65535 == 16
+#guard tsClz32 65536 == 15
+#guard tsClz32 65537 == 15
+#guard tsClz32 255 == 24
+#guard tsClz32 256 == 23
+#guard tsClz32 257 == 23
+#guard tsClz32 (-4294967295) == 31
+#guard tsClz32 (-4294967296) == 32
+#guard tsClz32 (-4294967297) == 0
+#guard tsClz32 (-65535) == 0
+#guard tsClz32 (-255) == 0
+#guard tsClz32 0.5 == 32
+#guard tsClz32 1e20 == 1
+
+-- test262 `imul/results.js`
+#guard tsImul (-2.0) (-2.0) == 4
+#guard tsImul 4294967295 5 == -5
+#guard tsImul 4294967294 5 == -10
+#guard tsImul (-0.0) 7 == 0
+#guard tsImul 0.1 7 == 0
+#guard tsImul 0.9 7 == 0
+#guard tsImul 1.1 7 == 7
+#guard tsImul 1.9 7 == 7
+#guard tsImul 1073741824 7 == -1073741824
+#guard tsImul 1073741824 1073741824 == 0
+#guard tsImul (-1073741824) 7 == 1073741824
+#guard tsImul (-1073741824) (-1073741824) == 0
+#guard tsImul 2147483648 7 == -2147483648
+#guard tsImul 2147483648 2147483648 == 0
+#guard tsImul (-2147483648) 7 == -2147483648
+#guard tsImul 2147483647 7 == 2147483641
+#guard tsImul 2147483647 2147483647 == 1
+#guard tsImul 65536 65536 == 0
+#guard tsImul Js.floatNaN 7 == 0
+#guard tsImul Js.floatInf 7 == 0
+#guard tsImul (-4294967297) 3 == -3
+#guard tsImul 1e20 1 == 1661992960
+
+-- The result is `+0`, never `-0`: `==` cannot see the sign, the bits can.
+example : (tsImul (-0.0) 7).toBits = 0 := by decide
+example : (tsImul (-1.0) 0).toBits = 0 := by decide
+#guard (tsImul (-0.0) 7).toBits == 0
+#guard (tsImul (-1.0) 0).toBits == 0
