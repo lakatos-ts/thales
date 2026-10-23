@@ -265,6 +265,8 @@ attribute [tarski_eval]
   arrayMapRef arrayPopRef arrayReduceRef arrayReduceRightRef arrayReverseRef
   arrayShiftRef arraySliceRef arraySomeRef arraySortRef arraySpliceRef
   arrayToLocaleStringRef arrayToStringRef arrayUnshiftRef
+  arrayFindLastRef arrayFindLastIndexRef arrayToReversedRef arrayToSortedRef
+  arrayToSplicedRef arrayWithRef
   objectCellRef arrayCellRef stringCellRef printCellRef hostCellRef
   numberCellRef booleanCellRef mathCellRef nanCellRef infinityCellRef
   parseFloatCellRef parseIntCellRef consoleCellRef functionCellRef

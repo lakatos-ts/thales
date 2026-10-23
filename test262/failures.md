@@ -70,7 +70,7 @@ left are filed rather than classified under a closed issue — #531,
 `%IteratorPrototype%` carrying no `@@toStringTag` — and #533 is the
 destructuring evaluation order the two order tests see.
 
-The 1,605 failures below, by owner: 1,041 what #376 excludes (`eval`,
+The 1,489 failures below, by owner: 1,035 what #376 excludes (`eval`,
 `Date`, `RegExp`, `Proxy`, `Reflect`, typed arrays, the keyed
 collections, explicit resource management, the `Iterator` constructor and
 its helpers, `Error.prototype.stack`, `JSON.rawJSON` and the reviver's
@@ -78,14 +78,28 @@ source text, `Array.fromAsync`, the `Function` constructor's semantics,
 `nativeFunctionMatcher.js`, which matches source text with a regular
 expression, and the `nonextensible-applies-to-private` proposal), 197 the
 global object (#487), 151 the transcendental `Math`
-members (#434), 110 the six ES2023 `Array.prototype` members (#513), 18 ToLength of an infinite
-`length` (#514), 16 the Unicode character database (#518), 14
+members (#434), 18 ToLength of an infinite `length` (#514), 16 the Unicode character database (#518), 14
 `Array.from` over an iterable (#531), 13 `Math.clz32`/`imul` (#440), 10
 the `@@split`, `@@replace`, and `@@match` lookups the `String` methods
 skip (#523), 5 `Array.prototype[@@unscopables]` (#524), 5 `Math.random`
 (#445), 2 `%IteratorPrototype%`'s `@@toStringTag` (#532), and 23 the ten
 filed defects (#436, #460, #476, #496, #499, #512, #516, #520, #522, and
 #533).
+
+**The six ES2023 `Array.prototype` members moved 116 tests from fail to
+pass** in their own six directories and nowhere else: `findLast`,
+`findLastIndex`, `toReversed`, `toSorted`, `toSpliced`, and `with` (#56
+in this repository) are 124 pass and 2 fail, and the 110 rows that
+waited on #513 are gone. The other six that moved were each directory's
+`not-a-constructor.js`, classified under `isConstructor.js` needing
+`Reflect.construct`: the harness catches the `ReferenceError` and
+answers `false`, which is the right answer for a member that is not a
+constructor, so the row was the member's absence all along. The two that
+still fail are `callbackfn-resize-arraybuffer.js`, which is typed arrays
+(#376). The four change-by-copy members read every element through
+`Get` into a fresh array made by ArrayCreate — a hole arrives as
+`undefined` and a subclass gets a plain `Array` — and `with` refuses an
+index outside the array with a `RangeError` where `at` would clamp.
 
 **The global `isNaN` and `isFinite` moved 69 tests from fail to pass**
 across thirteen directories — the arithmetic operators, `unary-plus` and
@@ -175,13 +189,11 @@ nothing else — and the four `Array.prototype` iterator members 28 and 0.
 String iterator cleared `String/prototype/Symbol.iterator` to 6 pass and
 0 fail.
 
-**The forty-eight `Array` directories #390 added are 2,584 pass and 266
+**The forty-eight `Array` directories #390 added are 2,700 pass and 150
 fail**, with 108 unsupported and 124 not run — 88 `async`
 `Array.fromAsync` tests and 36 `noStrict` ones, neither of which this
-epic runs. Not one of the 266 is a member of `Array.prototype` answering
-the wrong thing: 110 are the six ES2023 members this slice does not write
-— `findLast`, `findLastIndex`, `toReversed`, `toSorted`, `toSpliced`, and
-`with`, which are #513's; 107 are what #376 excludes, `Proxy`, `Date`,
+epic runs. Not one of the 150 is a member of `Array.prototype` answering
+the wrong thing: 101 are what #376 excludes, `Proxy`, `Date`,
 regular expressions, typed arrays, `isConstructor.js`, `eval`,
 `Array.fromAsync`, and `Reflect` among them; 18 are ToLength of an
 infinite `length` (#514); 14 are `Array.from` never asking for
@@ -275,12 +287,8 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Array/prototype/filter`                               | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
 | `test/built-ins/Array/prototype/find`                                 | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
 | `test/built-ins/Array/prototype/findIndex`                            | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
-| `test/built-ins/Array/prototype/findLast`                             | 15    | builtin      | the ES2023 `Array.prototype` members are absent                                                                     | #513  |
 | `test/built-ins/Array/prototype/findLast`                             | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
-| `test/built-ins/Array/prototype/findLast`                             | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
-| `test/built-ins/Array/prototype/findLastIndex`                        | 15    | builtin      | the ES2023 `Array.prototype` members are absent                                                                     | #513  |
 | `test/built-ins/Array/prototype/findLastIndex`                        | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
-| `test/built-ins/Array/prototype/findLastIndex`                        | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
 | `test/built-ins/Array/prototype/flat`                                 | 1     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
 | `test/built-ins/Array/prototype/flatMap`                              | 2     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
 | `test/built-ins/Array/prototype/flatMap`                              | 1     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
@@ -324,15 +332,7 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Array/prototype/some`                                 | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
 | `test/built-ins/Array/prototype/splice`                               | 5     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
 | `test/built-ins/Array/prototype/splice`                               | 2     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
-| `test/built-ins/Array/prototype/toReversed`                           | 15    | builtin      | the ES2023 `Array.prototype` members are absent                                                                     | #513  |
-| `test/built-ins/Array/prototype/toReversed`                           | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
-| `test/built-ins/Array/prototype/toSorted`                             | 18    | builtin      | the ES2023 `Array.prototype` members are absent                                                                     | #513  |
-| `test/built-ins/Array/prototype/toSorted`                             | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
-| `test/built-ins/Array/prototype/toSpliced`                            | 28    | builtin      | the ES2023 `Array.prototype` members are absent                                                                     | #513  |
-| `test/built-ins/Array/prototype/toSpliced`                            | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
 | `test/built-ins/Array/prototype/unshift`                              | 2     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
-| `test/built-ins/Array/prototype/with`                                 | 19    | builtin      | the ES2023 `Array.prototype` members are absent                                                                     | #513  |
-| `test/built-ins/Array/prototype/with`                                 | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
 | `test/built-ins/ArrayIteratorPrototype/next`                          | 9     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
 | `test/built-ins/Boolean`                                              | 1     | builtin      | there is no global object                                                                                           | #487  |
 | `test/built-ins/Boolean`                                              | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |

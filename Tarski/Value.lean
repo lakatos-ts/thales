@@ -643,6 +643,21 @@ inductive NativeFn where
   | arrayToString
   /-- `Array.prototype.unshift` (23.1.3.37). -/
   | arrayUnshift
+  -- ES2023's six (#56): `find` and `findIndex` counting down, and the
+  -- four change-by-copy members, each its ES2022 twin written into a
+  -- fresh array made by ArrayCreate rather than ArraySpeciesCreate.
+  /-- `Array.prototype.findLast` (23.1.3.11). -/
+  | arrayFindLast
+  /-- `Array.prototype.findLastIndex` (23.1.3.12). -/
+  | arrayFindLastIndex
+  /-- `Array.prototype.toReversed` (23.1.3.34). -/
+  | arrayToReversed
+  /-- `Array.prototype.toSorted` (23.1.3.35). -/
+  | arrayToSorted
+  /-- `Array.prototype.toSpliced` (23.1.3.36). -/
+  | arrayToSpliced
+  /-- `Array.prototype.with` (23.1.3.39). -/
+  | arrayWith
   /-- `get Array[@@species]` (23.1.2.5). It answers its receiver, which
   is how a subclass constructor becomes its own species. -/
   | arraySpecies

@@ -203,6 +203,52 @@ the two that visit a hole, as `undefined`. -/
         [fn1 "x" (.binary .strictEq (.ident "x") .undefLit)]) ]
   == "0"
 
+/-! ## `findLast` and `findLastIndex`
+
+`find` and `findIndex` counting down (23.1.3.11, .12): every index is
+visited, a hole as `undefined`, from the last to the first, and the walk
+stops at the first truthy answer. -/
+
+#guard outcome
+    (expr (callOn (nums [1.0, 2.0, 3.0]) "findLast" [fn1 "x" (.binary .lt (.ident "x")
+      (.numLit 3.0))]))
+  == "2"
+#guard outcome
+    (expr (callOn (nums [1.0]) "findLast" [fn1 "x" (.boolLit false)])) == "undefined"
+#guard outcome
+    (expr (callOn (nums [1.0, 2.0, 3.0]) "findLastIndex" [fn1 "x" (.binary .lt (.ident "x")
+      (.numLit 3.0))]))
+  == "1"
+#guard outcome (expr (callOn (nums [1.0]) "findLastIndex" [fn1 "x" (.boolLit false)])) == "-1"
+-- The order is descending, and the walk stops at the first hit.
+#guard outcome
+    [ .varDecl .«let» [{ target := "seen", init := some (.strLit "") }],
+      .exprStmt (callOn (nums [1.0, 2.0, 3.0]) "findLast"
+        [fn1 "x" (.logical .and
+          (.assign (.ident "seen") (.binary .add (.ident "seen") (.ident "x")))
+          (.binary .strictEq (.ident "x") (.numLit 2.0)))]),
+      .exprStmt (.ident "seen") ]
+  == "32"
+-- A hole is visited, as `undefined`.
+#guard outcome
+    [ .varDecl .«const» [{ target := "xs", init := some (holes 2.0) }],
+      .exprStmt (.assign (.index (.ident "xs") (.numLit 0.0)) (.numLit 1.0)),
+      .exprStmt (callOn (.ident "xs") "findLastIndex"
+        [fn1 "x" (.binary .strictEq (.ident "x") .undefLit)]) ]
+  == "1"
+-- The predicate is checked before any element, so an empty array still
+-- refuses a non-function.
+#guard outcome (expr (callOn (.arrayLit []) "findLast" [.numLit 1.0]))
+  == "uncaught: TypeError: not a function"
+-- Generic over an array-like, with `(value, index, object)` as the
+-- arguments.
+#guard outcome
+    (expr (.call (.member (.member (.member (.ident "Array") "prototype") "findLast") "call")
+      [.objectLit [.init "length" (.numLit 2.0), .init "0" (.strLit "a"),
+        .init "1" (.strLit "b")],
+       fn2 "v" "i" (.binary .strictEq (.ident "i") (.numLit 1.0))]))
+  == "b"
+
 /-! ## `reduce` and `reduceRight`
 
 With an initial value the fold starts there; without one it starts at the

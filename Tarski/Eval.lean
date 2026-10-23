@@ -169,7 +169,8 @@ members in one definition over a `VisitKind` — `reduceFrom`,
 `lastIndexOfFrom`, `includesFrom`, `fillFrom`, `reverseFrom`,
 `copyElements`, `moveElements`, `deleteFrom`, `flattenInto`,
 `toLocaleStringFrom`, `collectPresent`, `mergeSortValues`,
-`mergeValues`, and `fromArrayLike`.
+`mergeValues`, `fromArrayLike`, and ES2023's three — `findLastFrom`,
+`copyThrough`, and `reverseInto`.
 
 ## The messages the evaluator raises
 
@@ -195,8 +196,9 @@ new refusal is written against a list rather than invented.
 | `Object.keys` of `undefined` or `null`             | `TypeError`      | `Cannot convert undefined or null to object`                 |
 | `Object(v)` or `hasOwnProperty` on a string primitive | `TypeError`  | `Cannot convert a primitive to an object`                     |
 | `reduce` of an empty array with no initial value    | `TypeError`      | `Reduce of empty array with no initial value`                 |
-| `sort` with a comparator that is not a function     | `TypeError`      | `The comparison function must be either a function or undefined` |
-| a `push`, `unshift`, `splice`, `concat`, `flat`, or `flatMap` whose result would pass 2^53 - 1 elements | `TypeError` | `Array length exceeds 2**53 - 1` |
+| `sort` or `toSorted` with a comparator that is not a function | `TypeError` | `The comparison function must be either a function or undefined` |
+| `with` at an index outside `[-len, len)`           | `RangeError`     | `Invalid index`                                               |
+| a `push`, `unshift`, `splice`, `toSpliced`, `concat`, `flat`, or `flatMap` whose result would pass 2^53 - 1 elements | `TypeError` | `Array length exceeds 2**53 - 1` |
 | `Number.prototype.{toString,valueOf,toFixed,toExponential,toPrecision,toLocaleString}` off a Number | `TypeError` | `Number.prototype.<name> requires that 'this' be a Number` |
 | `Boolean.prototype.toString` off a Boolean         | `TypeError`      | `Boolean.prototype.toString requires that 'this' be a Boolean` |
 | `Boolean.prototype.valueOf` off a Boolean          | `TypeError`      | `Boolean.prototype.valueOf requires that 'this' be a Boolean`  |
@@ -426,6 +428,18 @@ def spliceDeleteCount (x : Float) (room : Nat) : Nat :=
   match Number.FloatOps.integerOrInfinity? x with
   | none => if x < 0.0 then 0 else room
   | some i => if i ≤ 0 then 0 else min i.toNat room
+
+/-- `Array.prototype.with`'s index (23.1.3.39 steps 4–6): relative from
+the end when negative, and `none` — the caller's `RangeError` — rather
+than a clamp when it lands outside `[0, len)`, an infinity of either
+sign included. -/
+def withIndex (rel : Option Int) (len : Nat) : Option Nat :=
+  match rel with
+  | none => none
+  | some i =>
+    if 0 ≤ i then (if i < len then some i.toNat else none)
+    else if (len : Int) + i < 0 then none
+    else some ((len : Int) + i).toNat
 
 /-- Whether a value is an object, as a `Bool` rather than a `match`:
 `arraySpeciesCreate` and `spreadInto` each ask it to decide whether a
@@ -1173,6 +1187,21 @@ def arrayCreate (len : Nat) : EvalM Value := do
 **before** any element is read, so that `[].every(1)` still throws. -/
 def requireCallable (v : Value) : EvalM Unit := do
   if ← isCallable v then pure () else throwJsError .typeError "not a function"
+
+/-- `sort`'s and `toSorted`'s comparator (23.1.3.30 step 1, 23.1.3.35
+step 1): `undefined` is none, a callable is itself, and anything else
+is the refusal — made **first**, ahead of ToObject, so that
+`Array.prototype.sort.call(undefined, 1)` is this refusal and not the
+one ToObject would make. -/
+def sortComparator (v : Value) : EvalM (Option Value) := do
+  match v with
+  | .prim .undef => pure none
+  | v => do
+    let callable ← isCallable v
+    if callable then pure (some v)
+    else
+      throwJsError .typeError
+        "The comparison function must be either a function or undefined"
 
 /-- `[[Delete]]` (10.1.10) behind the `delete` operator, with the
 strict-mode `TypeError` at the one refusal: a non-configurable own
@@ -3624,7 +3653,9 @@ def callNative (f : NativeFn) (thisArg : Value) (args : List Value) : EvalM Valu
   | .arrayUnshift | .arrayFrom | .arrayOf | .arrayEvery | .arrayFilter
   | .arrayFind | .arrayFindIndex | .arrayFlat | .arrayFlatMap | .arrayForEach
   | .arrayMap | .arrayReduce | .arrayReduceRight | .arraySome
-  | .arraySort | .arraySpecies => callArrayNative f thisArg args
+  | .arraySort | .arraySpecies | .arrayFindLast | .arrayFindLastIndex
+  | .arrayToReversed | .arrayToSorted | .arrayToSpliced | .arrayWith =>
+    callArrayNative f thisArg args
   -- The iterator surface is a group split out for `callReflectNative`'s
   -- reason but — unlike the others — **registered** in `tarski_eval`:
   -- seven arms are nowhere near the ceiling, and a closed destructuring
@@ -5174,6 +5205,45 @@ def fromArrayLike (src out : Ref) (i len : Nat) (mapper : Option (Value × Value
     fromArrayLike src out (i + 1) len mapper
   partial_fixpoint
 
+/-- `findLast` and `findLastIndex` (23.1.3.11, .12): `find`'s walk
+counting down, every index visited and a hole read as `undefined` as
+there. `i` is **one past** the index to look at, as `lastIndexOfFrom`'s
+is, so that the walk can count down through 0 in a `Nat`. They are not
+two more `VisitKind`s because the direction is the whole difference, and
+a kind only a downward walk can run would be a dead arm of
+`visitElements`. -/
+def findLastFrom (index : Bool) (o : Ref) (cb thisArg : Value) (i : Nat) : EvalM Value := do
+  if i == 0 then pure (if index then .prim (.num (-1.0)) else undefValue)
+  else do
+    let k := i - 1
+    let v ← getProp (.obj o) (Nat.repr k)
+    let r ← callFunction cb thisArg [v, Value.ofNat k, .obj o]
+    if toBooleanPrim r then pure (if index then Value.ofNat k else v)
+    else findLastFrom index o cb thisArg k
+  partial_fixpoint
+
+/-- A run of elements copied *through* holes: Get, then
+CreateDataPropertyOrThrow, with no HasProperty between them, so a hole
+arrives as `undefined` and is an own property of the result. The
+change-by-copy members' copying step (23.1.3.36 steps 15–19, 23.1.3.39
+step 9), where `copyElements` is `slice`'s and keeps a hole. -/
+def copyThrough (src out : Ref) (i j count : Nat) : EvalM Unit := do
+  if count == 0 then pure ()
+  else do
+    createDataPropertyOrThrow out (Nat.repr j) (← getProp (.obj src) (Nat.repr i))
+    copyThrough src out (i + 1) (j + 1) (count - 1)
+  partial_fixpoint
+
+/-- `toReversed`'s copy (23.1.3.34 step 5): the element at `len - k - 1`
+read through, then defined at `k`, so the reads happen in descending
+order. -/
+def reverseInto (src out : Ref) (k len : Nat) : EvalM Unit := do
+  if k < len then do
+    createDataPropertyOrThrow out (Nat.repr k) (← getProp (.obj src) (Nat.repr (len - k - 1)))
+    reverseInto src out (k + 1) len
+  else pure ()
+  partial_fixpoint
+
 /-- The rest of the `Array` surface: the whole of 23.1.3 but the four
 iterator members (#394), plus `Array.from` and `Array.of`.
 
@@ -5487,17 +5557,9 @@ def callArrayNative (f : NativeFn) (thisArg : Value) (args : List Value) : EvalM
       (some (args.headD undefValue, args[1]?.getD undefValue)) 0
     pure a
   | .arraySort => do
-    -- 23.1.3.30. The comparator is checked **first**, ahead of ToObject,
-    -- so `Array.prototype.sort.call(undefined, 1)` is this refusal and
-    -- not the one ToObject would make.
-    let cmp : Option Value ← match args.headD undefValue with
-      | .prim .undef => pure none
-      | v => do
-        let callable ← isCallable v
-        if callable then pure (some v)
-        else
-          throwJsError .typeError
-            "The comparison function must be either a function or undefined"
+    -- 23.1.3.30. The comparator is checked **first**, ahead of ToObject
+    -- (`sortComparator` says why).
+    let cmp ← sortComparator (args.headD undefValue)
     let o ← toObjectValue thisArg
     let len ← lengthOfArrayLike o
     let items ← collectPresent o 0 len
@@ -5505,6 +5567,87 @@ def callArrayNative (f : NativeFn) (thisArg : Value) (args : List Value) : EvalM
     pushElements (.obj o) 0 sorted
     deleteFrom o sorted.length len
     pure (.obj o)
+  | .arrayFindLast => do
+    -- 23.1.3.11, `find` counting down: the callback is checked after
+    -- ToObject and the length and before any element, as `find`'s is.
+    let o ← toObjectValue thisArg
+    let len ← lengthOfArrayLike o
+    requireCallable (args.headD undefValue)
+    findLastFrom false o (args.headD undefValue) (args[1]?.getD undefValue) len
+  | .arrayFindLastIndex => do
+    -- 23.1.3.12, `findIndex` counting down.
+    let o ← toObjectValue thisArg
+    let len ← lengthOfArrayLike o
+    requireCallable (args.headD undefValue)
+    findLastFrom true o (args.headD undefValue) (args[1]?.getD undefValue) len
+  | .arrayToReversed => do
+    -- 23.1.3.34. ArrayCreate rather than ArraySpeciesCreate, as all
+    -- four change-by-copy members have it: a subclass's `toReversed`
+    -- answers a plain `Array`, and a length past 2^32 - 1 is ArrayCreate's
+    -- `RangeError` before any element is read.
+    let o ← toObjectValue thisArg
+    let len ← lengthOfArrayLike o
+    let a ← arrayCreate len
+    let out ← toObjectValue a
+    reverseInto o out 0 len
+    pure a
+  | .arrayToSorted => do
+    -- 23.1.3.35. The comparator check is first, as `sort`'s is; the
+    -- result is allocated before the elements are read, and every
+    -- element — a hole as `undefined` — is read before any comparison
+    -- (SortIndexedProperties with holes read through).
+    let cmp ← sortComparator (args.headD undefValue)
+    let o ← toObjectValue thisArg
+    let len ← lengthOfArrayLike o
+    let a ← arrayCreate len
+    let out ← toObjectValue a
+    let items ← listFromArrayLike (.obj o) 0 len
+    let sorted ← mergeSortValues cmp items
+    defineElements out 0 sorted
+    pure a
+  | .arrayToSpliced => do
+    -- 23.1.3.36. `splice`'s arguments, the three absences told apart as
+    -- there: no `start` is no deletion, no `skipCount` is the whole
+    -- tail, and an `undefined` one is ToIntegerOrInfinity's 0. The
+    -- result is the receiver's elements around the gap read through,
+    -- with the items between them; nothing in the gap is read.
+    let o ← toObjectValue thisArg
+    let len ← lengthOfArrayLike o
+    let startArg ← toNumberValue (args.headD undefValue)
+    let start := relativeIndex startArg len
+    let items := args.drop 2
+    let skip ← match args with
+      | [] => pure 0
+      | [_] => pure (len - start)
+      | _ :: d :: _ => do
+        let x ← toNumberValue d
+        pure (spliceDeleteCount x (len - start))
+    let newLen := len + items.length - skip
+    if maxArrayLength < newLen then
+      throwJsError .typeError "Array length exceeds 2**53 - 1"
+    else do
+      let a ← arrayCreate newLen
+      let out ← toObjectValue a
+      copyThrough o out 0 0 start
+      defineElements out start items
+      copyThrough o out (start + skip) (start + items.length) (len - start - skip)
+      pure a
+  | .arrayWith => do
+    -- 23.1.3.39. A relative index, but one outside the array is a
+    -- `RangeError` rather than a clamp — checked before the result is
+    -- allocated — and the element it replaces is never read.
+    let o ← toObjectValue thisArg
+    let len ← lengthOfArrayLike o
+    let rel ← toIntegerOrInfinityValue (args.headD undefValue)
+    match withIndex rel len with
+    | none => throwJsError .rangeError "Invalid index"
+    | some k => do
+      let a ← arrayCreate len
+      let out ← toObjectValue a
+      copyThrough o out 0 0 k
+      createDataPropertyOrThrow out (Nat.repr k) (args[1]?.getD undefValue)
+      copyThrough o out (k + 1) (k + 1) (len - k - 1)
+      pure a
   | .arrayFrom => do
     -- 23.1.2.1 without step 5's `@@iterator` read (#394): an iterable is
     -- read by index here like any other array-like. A constructor `this`
