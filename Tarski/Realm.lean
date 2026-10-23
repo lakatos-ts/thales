@@ -69,9 +69,10 @@ the literal against the constants so the two cannot drift apart.
 | 156–157   | `Array.from`, `Array.of`                                  |
 | 158–184   | `Array.prototype.at`, `concat`, `copyWithin`, `every`, `fill`, `filter`, `find`, `findIndex`, `flat`, `flatMap`, `forEach`, `includes`, `indexOf`, `lastIndexOf`, `map`, `pop`, `reduce`, `reduceRight`, `reverse`, `shift`, `slice`, `some`, `sort`, `splice`, `toLocaleString`, `toString`, `unshift` |
 | 185       | `get Array[@@species]`                                    |
+| 186–187   | `isNaN`, `isFinite`, the global predicates                |
 
-A hundred and eighty-six objects, then, and thirty-seven cells. The
-twenty-four global bindings are cells 0–23: the seven `Error`
+A hundred and eighty-eight objects, then, and thirty-nine cells. The
+first twenty-four global bindings are cells 0–23: the seven `Error`
 constructors, then `Object`, `Array`, `String`, `print`, `$262`,
 `Number`, `Boolean`, `Math`, `NaN`, `Infinity`, `parseFloat`,
 `parseInt`, `console`, `Function`, `Symbol`, `JSON`, and
@@ -79,7 +80,9 @@ constructors, then `Object`, `Array`, `String`, `print`, `$262`,
 thirteen **well-known symbols' identities**, allocated so that
 `Symbol.iterator` is one fixed symbol per realm and so that a symbol's
 identity is a cell here exactly as a `Symbol()` call's is. They are
-immutable and empty and are never read.
+immutable and empty and are never read. Cells 37–38 are the global
+`isNaN` and `isFinite`, after the symbols because cells, like
+references, are only ever appended.
 
 `Symbol` is the third primitive (`Tarski/Value.lean`), and the thirteen
 well-known symbols are *values* here: `@@toPrimitive`, `@@toStringTag`,
@@ -112,6 +115,10 @@ evaluator itself throws, and its order fixes references 0–13 and cells
 `parseFloat` and `parseInt` are **one function object each**, bound
 globally and read as `Number.parseFloat` and `Number.parseInt`, so
 `Number.parseInt === parseInt` is true, as the specification requires.
+The global `isNaN` and `isFinite` are **not** `Number.isNaN` and
+`Number.isFinite`: the globals coerce through ToNumber (19.2.3, 19.2.2)
+where the `Number.` predicates answer `false` for a non-Number, so they
+are two objects each and `Number.isNaN === isNaN` is false.
 
 `Number`, `Boolean`, and `Math` are writable cells like every other
 global function binding. `NaN` and `Infinity` are **not**: they are the
@@ -712,6 +719,14 @@ receiver. It is what makes `ArraySpeciesCreate` build a subclass: a
 `A[@@species]` answers `A`. -/
 def arraySpeciesGetterRef : Ref := 185
 
+/-- The global `isNaN` (19.2.3), which coerces its argument where
+`Number.isNaN` does not; a function object of its own, with no alias on
+`Number`. -/
+def isNaNRef : Ref := 186
+
+/-- The global `isFinite` (19.2.2), likewise. -/
+def isFiniteRef : Ref := 187
+
 /-- A built-in function object with extra own properties after its
 `length` and `name`: 17.1's shape, which is what makes
 `Object.getOwnPropertyNames(Object)` start `["length", "name",
@@ -858,6 +873,14 @@ def jsonCellRef : CellRef := 22
 /-- The cell `AggregateError` is bound in. -/
 def aggregateErrorCellRef : CellRef := 23
 
+/-- The cell the global `isNaN` is bound in, writable like every other
+global function binding. It comes after the well-known symbols' cells
+because cells are only ever appended. -/
+def isNaNCellRef : CellRef := 37
+
+/-- The cell the global `isFinite` is bound in. -/
+def isFiniteCellRef : CellRef := 38
+
 /-- The scope a script's own declarations are instantiated on top of:
 `ErrorKind.all.map (fun k => (k.name, k.cellRef))`, written out so that
 `simp` sees a literal list. There is no global *object* (#487), so a
@@ -886,7 +909,9 @@ def globalEnv : Env :=
     ("Function", 20),
     ("Symbol", 21),
     ("JSON", 22),
-    ("AggregateError", 23) ]
+    ("AggregateError", 23),
+    ("isNaN", 37),
+    ("isFinite", 38) ]
 
 /-- The heap a script starts from: the realm, laid out at the references
 above. -/
@@ -937,7 +962,11 @@ def Heap.initial : Heap where
        { mutable := false, value := none },           -- Symbol.split
        { mutable := false, value := none },           -- Symbol.toPrimitive
        { mutable := false, value := none },           -- Symbol.toStringTag
-       { mutable := false, value := none } ]          -- Symbol.unscopables
+       { mutable := false, value := none },           -- Symbol.unscopables
+       -- 37–38: the two global predicates, bound after the symbols
+       -- because cells are only ever appended.
+       { mutable := true, value := some (.obj 186) }, -- isNaN
+       { mutable := true, value := some (.obj 187) } ] -- isFinite
   objects :=
     #[ -- 0: Error.prototype. `toString` is on it because the binary's
        -- uncaught-error report runs that algorithm anyway. It is an
@@ -1647,6 +1676,10 @@ def Heap.initial : Heap where
        Obj.builtin .arrayUnshift "unshift" 1,
        -- 185: get Array[@@species]. A symbol-keyed accessor's `name` is
        -- `"get "` and its key's description in brackets (10.2.9).
-       Obj.builtin .arraySpecies "get [Symbol.species]" 0 ]
+       Obj.builtin .arraySpecies "get [Symbol.species]" 0,
+       -- 186: the global isNaN
+       Obj.builtin .globalIsNaN "isNaN" 1,
+       -- 187: the global isFinite
+       Obj.builtin .globalIsFinite "isFinite" 1 ]
 
 end Tarski

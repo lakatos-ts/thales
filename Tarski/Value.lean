@@ -428,6 +428,12 @@ inductive NativeFn where
   | parseFloat
   /-- The global `parseInt`, which is also `Number.parseInt`. -/
   | parseInt
+  /-- The global `isNaN` (19.2.3), which coerces its argument through
+  ToNumber where `Number.isNaN` does not. Prefixed `global`, not
+  `number`, because it is a different object from `numberIsNaN`. -/
+  | globalIsNaN
+  /-- The global `isFinite` (19.2.2), likewise. -/
+  | globalIsFinite
   /-- `Boolean`, as a converter and as a wrapper constructor. -/
   | booleanCtor
   /-- `Boolean.prototype.toString`. -/
