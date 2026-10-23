@@ -52,6 +52,11 @@ test/built-ins/Boolean
 test/built-ins/parseFloat
 test/built-ins/parseInt
 
+# The two global predicates, which coerce where the `Number.` ones do
+# not (#17).
+test/built-ins/isNaN
+test/built-ins/isFinite
+
 # The classes (#384).
 test/language/statements/class
 test/language/expressions/class

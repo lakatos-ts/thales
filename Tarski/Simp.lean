@@ -268,6 +268,7 @@ attribute [tarski_eval]
   objectCellRef arrayCellRef stringCellRef printCellRef hostCellRef
   numberCellRef booleanCellRef mathCellRef nanCellRef infinityCellRef
   parseFloatCellRef parseIntCellRef consoleCellRef functionCellRef
+  isNaNRef isFiniteRef isNaNCellRef isFiniteCellRef
   symbolProtoRef symbolCtorRef symbolForRef symbolKeyForRef symbolProtoToStringRef
   symbolProtoValueOfRef symbolDescriptionRef symbolToPrimitiveRef symbolRegistryRef
   jsonRef jsonParseRef jsonStringifyRef

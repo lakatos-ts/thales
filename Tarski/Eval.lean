@@ -3556,6 +3556,15 @@ def callNative (f : NativeFn) (thisArg : Value) (args : List Value) : EvalM Valu
     let s ← toStringValue (args.headD undefValue)
     let r ← toNumberValue (args[1]?.getD undefValue)
     pure (.prim (.num (Number.parseInt s.toStringLossy (Number.FloatOps.tsToInt32 r))))
+  -- The global predicates coerce (19.2.3, 19.2.2 step 1: `? ToNumber`),
+  -- so a user `valueOf` runs and a Symbol throws, where the `Number.`
+  -- predicates above answer `false` for any non-Number.
+  | .globalIsNaN => do
+    let x ← toNumberValue (args.headD undefValue)
+    pure (.prim (.bool (Number.FloatOps.tsIsNaN x)))
+  | .globalIsFinite => do
+    let x ← toNumberValue (args.headD undefValue)
+    pure (.prim (.bool (Number.FloatOps.tsIsFinite x)))
   | .booleanCtor => pure (.prim (.bool (toBooleanPrim (args.headD undefValue))))
   | .booleanToString => do
     let b ← thisBooleanValue "toString" thisArg

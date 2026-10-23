@@ -51,10 +51,10 @@
   "test/language/statements/switch":
   {"unsupported": 4,
    "timeout": 0,
-   "pass": 13,
+   "pass": 14,
    "notRun": {"raw": 0, "noStrict": 2, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 22},
+   "fail": 21},
   "test/language/statements/return":
   {"unsupported": 0,
    "timeout": 0,
@@ -716,17 +716,17 @@
   "test/language/expressions/unary-plus":
   {"unsupported": 1,
    "timeout": 0,
-   "pass": 9,
+   "pass": 14,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 7},
+   "fail": 2},
   "test/language/expressions/unary-minus":
   {"unsupported": 3,
    "timeout": 0,
-   "pass": 7,
+   "pass": 10,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 4},
+   "fail": 1},
   "test/language/expressions/template-literal":
   {"unsupported": 0,
    "timeout": 0,
@@ -751,10 +751,10 @@
   "test/language/expressions/subtraction":
   {"unsupported": 5,
    "timeout": 0,
-   "pass": 21,
+   "pass": 30,
    "notRun": {"raw": 0, "noStrict": 1, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 11},
+   "fail": 2},
   "test/language/expressions/strict-equals":
   {"unsupported": 8,
    "timeout": 0,
@@ -814,17 +814,17 @@
   "test/language/expressions/multiplication":
   {"unsupported": 5,
    "timeout": 0,
-   "pass": 22,
+   "pass": 32,
    "notRun": {"raw": 0, "noStrict": 1, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 12},
+   "fail": 2},
   "test/language/expressions/modulus":
   {"unsupported": 6,
    "timeout": 0,
-   "pass": 17,
+   "pass": 31,
    "notRun": {"raw": 0, "noStrict": 1, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 16},
+   "fail": 2},
   "test/language/expressions/logical-or":
   {"unsupported": 0,
    "timeout": 0,
@@ -842,10 +842,10 @@
   "test/language/expressions/logical-and":
   {"unsupported": 0,
    "timeout": 0,
-   "pass": 14,
+   "pass": 16,
    "notRun": {"raw": 0, "noStrict": 1, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 3},
+   "fail": 1},
   "test/language/expressions/less-than-or-equal":
   {"unsupported": 6,
    "timeout": 0,
@@ -912,10 +912,10 @@
   "test/language/expressions/division":
   {"unsupported": 6,
    "timeout": 0,
-   "pass": 24,
+   "pass": 35,
    "notRun": {"raw": 0, "noStrict": 1, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 14},
+   "fail": 3},
   "test/language/expressions/delete":
   {"unsupported": 2,
    "timeout": 0,
@@ -1304,10 +1304,10 @@
   "test/language/expressions/addition":
   {"unsupported": 6,
    "timeout": 0,
-   "pass": 34,
+   "pass": 39,
    "notRun": {"raw": 0, "noStrict": 1, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 7},
+   "fail": 2},
   "test/language/block-scope/syntax/redeclaration-global":
   {"unsupported": 0,
    "timeout": 0,
@@ -1396,6 +1396,20 @@
   {"unsupported": 1,
    "timeout": 0,
    "pass": 51,
+   "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
+   "harnessError": 0,
+   "fail": 2},
+  "test/built-ins/isNaN":
+  {"unsupported": 0,
+   "timeout": 0,
+   "pass": 13,
+   "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
+   "harnessError": 0,
+   "fail": 2},
+  "test/built-ins/isFinite":
+  {"unsupported": 0,
+   "timeout": 0,
+   "pass": 13,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
    "fail": 2},
@@ -2228,17 +2242,17 @@
   "test/built-ins/Number/POSITIVE_INFINITY":
   {"unsupported": 0,
    "timeout": 0,
-   "pass": 2,
+   "pass": 4,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 2},
+   "fail": 0},
   "test/built-ins/Number/NEGATIVE_INFINITY":
   {"unsupported": 0,
    "timeout": 0,
-   "pass": 2,
+   "pass": 4,
    "notRun": {"raw": 0, "noStrict": 0, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 2},
+   "fail": 0},
   "test/built-ins/Number/MIN_VALUE":
   {"unsupported": 0,
    "timeout": 0,
@@ -2977,10 +2991,10 @@
   "test/built-ins/Array/prototype/sort":
   {"unsupported": 6,
    "timeout": 0,
-   "pass": 43,
+   "pass": 47,
    "notRun": {"raw": 0, "noStrict": 1, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 4},
+   "fail": 0},
   "test/built-ins/Array/prototype/some":
   {"unsupported": 3,
    "timeout": 0,
@@ -3047,10 +3061,10 @@
   "test/built-ins/Array/prototype/lastIndexOf":
   {"unsupported": 3,
    "timeout": 0,
-   "pass": 187,
+   "pass": 188,
    "notRun": {"raw": 0, "noStrict": 1, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 7},
+   "fail": 6},
   "test/built-ins/Array/prototype/keys":
   {"unsupported": 3,
    "timeout": 0,

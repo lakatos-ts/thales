@@ -17,8 +17,9 @@ object-literal directories #395 added, the seven `Symbol`, `JSON`, and
 `*Error` directories #392 added, `test/built-ins/String`, which #391
 added, the ten iterator, `for`-`of`, spread, and array-literal
 directories #394 added, the forty-eight `Array` directories #390
-added, `test/language/expressions/super`, which #601 added, and the `in`
-and `delete` directories #599 added — and
+added, `test/language/expressions/super`, which #601 added, the `in`
+and `delete` directories #599 added, and the two global predicate
+directories `isNaN` and `isFinite` (#17 in this repository) — and
 `thales/tests/tarski/test262-failures.test.ts` holds this file and
 `thales/test262/expected.json` together: each directory named here is a key
 of that file, every directory with a positive `fail` count appears, and the
@@ -69,23 +70,37 @@ left are filed rather than classified under a closed issue — #531,
 `%IteratorPrototype%` carrying no `@@toStringTag` — and #533 is the
 destructuring evaluation order the two order tests see.
 
-The 1,670 failures below, by owner: 1,040 what #376 excludes (`eval`,
+The 1,605 failures below, by owner: 1,041 what #376 excludes (`eval`,
 `Date`, `RegExp`, `Proxy`, `Reflect`, typed arrays, the keyed
 collections, explicit resource management, the `Iterator` constructor and
 its helpers, `Error.prototype.stack`, `JSON.rawJSON` and the reviver's
 source text, `Array.fromAsync`, the `Function` constructor's semantics,
 `nativeFunctionMatcher.js`, which matches source text with a regular
-expression, and the `nonextensible-applies-to-private` proposal), 195 the
+expression, and the `nonextensible-applies-to-private` proposal), 197 the
 global object (#487), 151 the transcendental `Math`
-members (#434), 110 the six ES2023 `Array.prototype` members (#513), 70
-the global `isNaN` and `isFinite` (#441), 18 ToLength of an infinite
+members (#434), 110 the six ES2023 `Array.prototype` members (#513), 18 ToLength of an infinite
 `length` (#514), 16 the Unicode character database (#518), 14
 `Array.from` over an iterable (#531), 13 `Math.clz32`/`imul` (#440), 10
 the `@@split`, `@@replace`, and `@@match` lookups the `String` methods
 skip (#523), 5 `Array.prototype[@@unscopables]` (#524), 5 `Math.random`
-(#445), 2 `%IteratorPrototype%`'s `@@toStringTag` (#532), and 21 the ten
+(#445), 2 `%IteratorPrototype%`'s `@@toStringTag` (#532), and 23 the ten
 filed defects (#436, #460, #476, #496, #499, #512, #516, #520, #522, and
 #533).
+
+**The global `isNaN` and `isFinite` moved 69 tests from fail to pass**
+across thirteen directories — the arithmetic operators, `unary-plus` and
+`unary-minus`, `logical-and`, `switch`, `Array.prototype.sort` and
+`lastIndexOf`, and the two `Number` infinity constants — and the 70 rows
+that waited on #441 are gone; the one test of the 70 that still fails,
+under `unary-plus`, was `eval`'s all along and is counted with #376 now.
+Their own directories, `test/built-ins/isNaN` and `isFinite`, joined the
+slice at 13 pass and 2 fail each: `prop-desc.js` reads the descriptor
+off a top-level `this`, which is the global object (#487), and
+`toprimitive-not-callable-throws.js` is the non-callable
+`@@toPrimitive` falling through to OrdinaryToPrimitive (#516), which
+`String/prototype/indexOf` sees too. The predicates coerce — `isNaN("NaN")`
+is `true` where `Number.isNaN("NaN")` is `false` — and are two objects
+of their own rather than the `Number.` ones.
 
 **Two class evaluations were wrong** when the class directories were
 first scored and are not wrong now. `super[super()]` read the key before
@@ -160,10 +175,10 @@ nothing else — and the four `Array.prototype` iterator members 28 and 0.
 String iterator cleared `String/prototype/Symbol.iterator` to 6 pass and
 0 fail.
 
-**The forty-eight `Array` directories #390 added are 2,579 pass and 271
+**The forty-eight `Array` directories #390 added are 2,584 pass and 266
 fail**, with 108 unsupported and 124 not run — 88 `async`
 `Array.fromAsync` tests and 36 `noStrict` ones, neither of which this
-epic runs. Not one of the 271 is a member of `Array.prototype` answering
+epic runs. Not one of the 266 is a member of `Array.prototype` answering
 the wrong thing: 110 are the six ES2023 members this slice does not write
 — `findLast`, `findLastIndex`, `toReversed`, `toSorted`, `toSpliced`, and
 `with`, which are #513's; 107 are what #376 excludes, `Proxy`, `Date`,
@@ -171,8 +186,8 @@ regular expressions, typed arrays, `isConstructor.js`, `eval`,
 `Array.fromAsync`, and `Reflect` among them; 18 are ToLength of an
 infinite `length` (#514); 14 are `Array.from` never asking for
 `@@iterator` (#531); 7 are the global object (#487); 5 are
-`Array.prototype[@@unscopables]` (#524); 5 are the global `isNaN`
-(#441); 2 are ArraySetLength's double coercion (#520); 2 are the
+`Array.prototype[@@unscopables]` (#524); 2 are ArraySetLength's double
+coercion (#520); 2 are the
 `Infinity` literal (#460); and 1 is a transcendental `Math` member
 (#434).
 
@@ -282,7 +297,6 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Array/prototype/indexOf`                              | 1     | out-of-scope | regular expressions are excluded by the epic                                                                        | #376  |
 | `test/built-ins/Array/prototype/lastIndexOf`                          | 2     | out-of-scope | regular expressions are excluded by the epic                                                                        | #376  |
 | `test/built-ins/Array/prototype/lastIndexOf`                          | 1     | bug          | a literal that overflows to `Infinity` reaches Lean as JSON `null`                                                  | #460  |
-| `test/built-ins/Array/prototype/lastIndexOf`                          | 1     | builtin      | the global `isNaN` and `isFinite` are absent                                                                        | #441  |
 | `test/built-ins/Array/prototype/lastIndexOf`                          | 1     | out-of-scope | `Date` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/lastIndexOf`                          | 1     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
 | `test/built-ins/Array/prototype/lastIndexOf`                          | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
@@ -308,7 +322,6 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Array/prototype/some`                                 | 1     | builtin      | there is no global object, so a top-level `this` is `undefined`                                                     | #487  |
 | `test/built-ins/Array/prototype/some`                                 | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Array/prototype/some`                                 | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
-| `test/built-ins/Array/prototype/sort`                                 | 4     | builtin      | the global `isNaN` and `isFinite` are absent                                                                        | #441  |
 | `test/built-ins/Array/prototype/splice`                               | 5     | out-of-scope | `Proxy` is excluded by the epic                                                                                     | #376  |
 | `test/built-ins/Array/prototype/splice`                               | 2     | bug          | ToLength of an infinite `length` answers 0                                                                          | #514  |
 | `test/built-ins/Array/prototype/toReversed`                           | 15    | builtin      | the ES2023 `Array.prototype` members are absent                                                                     | #513  |
@@ -419,8 +432,6 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Number`                                               | 2     | bug          | a numeric literal that overflows to `Infinity` reaches Lean as JSON `null`                                          | #460  |
 | `test/built-ins/Number`                                               | 1     | builtin      | there is no global object                                                                                           | #487  |
 | `test/built-ins/Number`                                               | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
-| `test/built-ins/Number/NEGATIVE_INFINITY`                             | 2     | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
-| `test/built-ins/Number/POSITIVE_INFINITY`                             | 2     | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
 | `test/built-ins/Number/prototype/toString`                            | 1     | out-of-scope | `Date` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Number/prototype/valueOf`                             | 1     | out-of-scope | `Date` is excluded by the epic                                                                                      | #376  |
 | `test/built-ins/Object`                                               | 2     | builtin      | there is no global object                                                                                           | #487  |
@@ -540,13 +551,16 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Symbol/species`                                       | 1     | out-of-scope | the keyed collections and promises are excluded by the epic                                                         | #376  |
 | `test/built-ins/ThrowTypeError`                                       | 2     | bug          | `%ThrowTypeError%` is extensible where 10.2.4.1 makes it frozen                                                     | #512  |
 | `test/built-ins/ThrowTypeError`                                       | 1     | builtin      | `Function.prototype.caller` and `arguments` are the `%ThrowTypeError%` accessors                                    | #487  |
+| `test/built-ins/isFinite`                                             | 1     | builtin      | there is no global object, so a top-level `this` is `undefined`                                                     | #487  |
+| `test/built-ins/isFinite`                                             | 1     | bug          | a non-callable `@@toPrimitive` handler falls back to OrdinaryToPrimitive instead of throwing                        | #516  |
+| `test/built-ins/isNaN`                                                | 1     | builtin      | there is no global object, so a top-level `this` is `undefined`                                                     | #487  |
+| `test/built-ins/isNaN`                                                | 1     | bug          | a non-callable `@@toPrimitive` handler falls back to OrdinaryToPrimitive instead of throwing                        | #516  |
 | `test/built-ins/parseFloat`                                           | 2     | builtin      | there is no global object                                                                                           | #487  |
 | `test/built-ins/parseInt`                                             | 2     | builtin      | there is no global object                                                                                           | #487  |
 | `test/harness`                                                        | 6     | builtin      | there is no global object                                                                                           | #487  |
 | `test/harness`                                                        | 4     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
 | `test/harness`                                                        | 1     | out-of-scope | `Date` is excluded by the epic                                                                                      | #376  |
 | `test/language/arguments-object`                                      | 2     | out-of-scope | an early-error test that reaches for `eval`                                                                         | #376  |
-| `test/language/expressions/addition`                                  | 5     | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
 | `test/language/expressions/addition`                                  | 1     | out-of-scope | `Date` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/addition`                                  | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/arrow-function`                            | 1     | builtin      | `Function.prototype.caller` and `arguments` are the `%ThrowTypeError%` accessors                                    | #487  |
@@ -570,7 +584,6 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/language/expressions/conditional`                               | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/delete`                                    | 2     | out-of-scope | regular expressions are excluded by the epic                                                                        | #376  |
 | `test/language/expressions/delete`                                    | 1     | builtin      | there is no global object, so a top-level `this` is `undefined`                                                     | #487  |
-| `test/language/expressions/division`                                  | 11    | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
 | `test/language/expressions/division`                                  | 2     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/division`                                  | 1     | bug          | the left operand is not converted fully before the right one                                                        | #436  |
 | `test/language/expressions/function`                                  | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
@@ -579,14 +592,11 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/language/expressions/in`                                        | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/less-than`                                 | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/less-than-or-equal`                        | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
-| `test/language/expressions/logical-and`                               | 2     | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
 | `test/language/expressions/logical-and`                               | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/logical-not`                               | 2     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/logical-or`                                | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
-| `test/language/expressions/modulus`                                   | 14    | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
 | `test/language/expressions/modulus`                                   | 1     | bug          | the left operand is not converted fully before the right one                                                        | #436  |
 | `test/language/expressions/modulus`                                   | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
-| `test/language/expressions/multiplication`                            | 10    | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
 | `test/language/expressions/multiplication`                            | 1     | bug          | the left operand is not converted fully before the right one                                                        | #436  |
 | `test/language/expressions/multiplication`                            | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/object`                                    | 8     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
@@ -594,17 +604,14 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/language/expressions/object/dstr`                               | 3     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
 | `test/language/expressions/strict-does-not-equals`                    | 2     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/strict-equals`                             | 2     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
-| `test/language/expressions/subtraction`                               | 9     | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
 | `test/language/expressions/subtraction`                               | 1     | bug          | the left operand is not converted fully before the right one                                                        | #436  |
 | `test/language/expressions/subtraction`                               | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/super`                                     | 4     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/super`                                     | 1     | bug          | `super()` with a non-constructor parent throws before evaluating its arguments                                      | #476  |
 | `test/language/expressions/tagged-template`                           | 3     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/template-literal`                          | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
-| `test/language/expressions/unary-minus`                               | 3     | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
 | `test/language/expressions/unary-minus`                               | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
-| `test/language/expressions/unary-plus`                                | 6     | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
-| `test/language/expressions/unary-plus`                                | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
+| `test/language/expressions/unary-plus`                                | 2     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/function-code`                                         | 6     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/statements/break`                                      | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/statements/class`                                      | 1     | builtin      | `Function.prototype.caller` and `arguments` are the `%ThrowTypeError%` accessors                                    | #487  |
@@ -659,7 +666,6 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/language/statements/let`                                        | 1     | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/statements/return`                                     | 1     | builtin      | the transcendental `Math` members, `sumPrecise`, and `f16round` are absent                                          | #434  |
 | `test/language/statements/switch`                                     | 21    | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
-| `test/language/statements/switch`                                     | 1     | builtin      | the global `isNaN` and `isFinite` are not in the realm                                                              | #441  |
 | `test/language/statements/try`                                        | 12    | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/statements/try`                                        | 2     | out-of-scope | an early-error test that reaches for `eval`                                                                         | #376  |
 | `test/language/statements/variable`                                   | 7     | out-of-scope | an early-error test that reaches for `eval`                                                                         | #376  |

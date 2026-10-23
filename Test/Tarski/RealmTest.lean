@@ -15,8 +15,8 @@ open Tarski
 
 /-! ## The shape -/
 
-#guard Heap.initial.cells.size == 37
-#guard Heap.initial.objects.size == 186
+#guard Heap.initial.cells.size == 39
+#guard Heap.initial.objects.size == 188
 
 /-! ## Each kind's prototype
 
@@ -68,7 +68,7 @@ constructor object. -/
         | some c => c.value == some (.obj k.ctorRef)
         | none => false)
 
-#guard globalEnv.length == 24
+#guard globalEnv.length == 26
 
 /-! ## `Error.prototype.toString` -/
 
@@ -600,6 +600,28 @@ on `Number` name the same reference, which is what
 #guard Env.lookup globalEnv "parseInt" == some parseIntCellRef
 #guard (Heap.initial.read parseFloatCellRef).bind (·.value) == some (.obj parseFloatRef)
 #guard (Heap.initial.read parseIntCellRef).bind (·.value) == some (.obj parseIntRef)
+
+/-! ## The global `isNaN` and `isFinite`
+
+One object each with a `[[Call]]` and nothing else, bound globally in a
+writable cell and distinct from `Number.isNaN` and `Number.isFinite`,
+which do not coerce. Their cells come after the well-known symbols'
+because references and cells are only ever appended. -/
+
+#guard Env.lookup globalEnv "isNaN" == some isNaNCellRef
+#guard Env.lookup globalEnv "isFinite" == some isFiniteCellRef
+#guard (Heap.initial.read isNaNCellRef).bind (·.value) == some (.obj isNaNRef)
+#guard (Heap.initial.read isFiniteCellRef).bind (·.value) == some (.obj isFiniteRef)
+#guard (Heap.initial.read isNaNCellRef).map (·.mutable) == some true
+#guard isNaNRef != numberIsNaNRef && isFiniteRef != numberIsFiniteRef
+#guard match Heap.initial.readObj isNaNRef, Heap.initial.readObj isFiniteRef with
+  | some a, some b =>
+    (match a.callable, b.callable with
+      | some (.native .globalIsNaN), some (.native .globalIsFinite) => true
+      | _, _ => false)
+      && a.getOwn "prototype" == none
+      && b.getOwn "prototype" == none
+  | _, _ => false
 
 /-! ## `Boolean.prototype` and `Boolean` -/
 

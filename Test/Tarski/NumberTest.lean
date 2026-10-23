@@ -532,3 +532,61 @@ radix, which is what the log below observes. -/
               .returnStmt (some (.numLit 10.0)) ])] ]),
       .exprStmt (.ident "log") ]
   == "sr"
+
+/-! ## The global `isNaN` and `isFinite`
+
+The two global predicates **coerce** (19.2.3, 19.2.2: `? ToNumber(number)`
+first), where `Number.isNaN` and `Number.isFinite` do not. They are
+bound globally and have no `Number.` alias, no `prototype`, and no
+`[[Construct]]`. -/
+
+#guard outcome (expr (.unary .typeof (.ident "isNaN"))) == "function"
+#guard outcome (expr (.unary .typeof (.ident "isFinite"))) == "function"
+#guard outcome (expr (.member (.ident "isNaN") "length")) == "1"
+#guard outcome (expr (.member (.ident "isFinite") "length")) == "1"
+#guard outcome (expr (.member (.ident "isNaN") "name")) == "isNaN"
+#guard outcome (expr (.member (.ident "isFinite") "name")) == "isFinite"
+#guard outcome (expr (.member (.ident "isNaN") "prototype")) == "undefined"
+#guard outcome (expr (.new (.ident "isNaN") [])) == "uncaught: TypeError: not a constructor"
+#guard outcome (expr (.binary .strictEq (numberProp "isNaN") (.ident "isNaN"))) == "false"
+
+#guard outcome (expr (.call (.ident "isNaN") [.ident "NaN"])) == "true"
+#guard outcome (expr (.call (.ident "isNaN") [.numLit 1.0])) == "false"
+#guard outcome (expr (.call (.ident "isNaN") [])) == "true"
+-- The contrast with `Number.isNaN("NaN")`, which is `false` above.
+#guard outcome (expr (.call (.ident "isNaN") [.strLit "NaN"])) == "true"
+#guard outcome (expr (.call (.ident "isNaN") [.strLit "abc"])) == "true"
+#guard outcome (expr (.call (.ident "isNaN") [.strLit " 12 "])) == "false"
+#guard outcome (expr (.call (.ident "isNaN") [.boolLit true])) == "false"
+#guard outcome (expr (.call (.ident "isNaN") [.nullLit])) == "false"
+#guard outcome (expr (.call (.ident "isNaN") [.objectLit []])) == "true"
+#guard outcome (expr (.call (.ident "isNaN") [.new (.ident "Number") [.ident "NaN"]])) == "true"
+
+#guard outcome (expr (.call (.ident "isFinite") [.numLit 1.0])) == "true"
+#guard outcome (expr (.call (.ident "isFinite") [.ident "Infinity"])) == "false"
+#guard outcome (expr (.call (.ident "isFinite") [.unary .neg (.ident "Infinity")])) == "false"
+#guard outcome (expr (.call (.ident "isFinite") [.ident "NaN"])) == "false"
+#guard outcome (expr (.call (.ident "isFinite") [])) == "false"
+-- The contrast with `Number.isFinite("1")`, which is `false` above.
+#guard outcome (expr (.call (.ident "isFinite") [.strLit "1"])) == "true"
+#guard outcome (expr (.call (.ident "isFinite") [.strLit "Infinity"])) == "false"
+#guard outcome (expr (.call (.ident "isFinite") [.nullLit])) == "true"
+#guard outcome (expr (.call (.ident "isFinite") [.objectLit []])) == "false"
+
+-- A Symbol has no ToNumber.
+#guard outcome (expr (.call (.ident "isNaN") [.call (.ident "Symbol") []]))
+  == "uncaught: TypeError: Cannot convert a Symbol value to a number"
+#guard outcome (expr (.call (.ident "isFinite") [.call (.ident "Symbol") []]))
+  == "uncaught: TypeError: Cannot convert a Symbol value to a number"
+
+-- ToNumber runs a user `valueOf`, and what it answers is what is tested.
+#guard outcome (expr (.call (.ident "isNaN")
+    [.objectLit [.init "valueOf" (.funcExpr none [] [.returnStmt (some (.ident "NaN"))])]]))
+  == "true"
+#guard outcome (expr (.call (.ident "isFinite")
+    [.objectLit [.init "valueOf" (.funcExpr none [] [.returnStmt (some (.numLit 2.0))])]]))
+  == "true"
+-- An abrupt `valueOf` is the call's own completion.
+#guard outcome (expr (.call (.ident "isFinite")
+    [.objectLit [.init "valueOf" (.funcExpr none [] [.throwStmt (.strLit "boom")])]]))
+  == "uncaught: boom"
