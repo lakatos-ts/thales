@@ -28,8 +28,85 @@ env:
   TZ: UTC
 
 jobs:
+  # Whether the heavy jobs below run. A pull request or merge-queue entry
+  # whose every changed path is documentation skips them; anything else,
+  # and every push, schedule, or dispatch run, runs them all. The docs list
+  # names paths one by one, so a path it does not name runs everything:
+  # `test262/failures.md` is read by a test and `test262/results.md` is
+  # written by `full-run`, so neither is here.
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    steps:
+      # A merge-queue entry is diffed with git, between the queue's base and
+      # head; a pull request through the API.
+      - name: Checkout
+        if: github.event_name == 'merge_group'
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # `code` is true when some changed path matches every rule: any path,
+      # but not a documentation one.
+      - name: Filter
+        id: filter
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        uses: dorny/paths-filter@v4
+        with:
+          predicate-quantifier: every
+          filters: |
+            code:
+              - '**'
+              - '!*.md'
+              - '!docs/**'
+              - '!LICENSE'
+              - '!tests/conformance/README.md'
+
+      - name: Decide
+        id: decide
+        env:
+          EVENT: ${{ github.event_name }}
+          CODE: ${{ steps.filter.outputs.code }}
+        run: |
+          case "$EVENT" in
+            pull_request | merge_group) run=$CODE ;;
+            *) run=true ;;
+          esac
+          test "$run" = true || test "$run" = false || { echo "unexpected filter output: '$run'"; exit 1; }
+          echo "run=$run" | tee -a "$GITHUB_OUTPUT"
+
+  # Prettier covers the documentation too, so it runs whatever changed.
+  format:
+    name: Format check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24.x"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Format check
+        run: npm run format:check
+
   lean-tests:
     name: Lean tests and fixture scripts
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -37,9 +114,6 @@ jobs:
         uses: actions/checkout@v7
 
       - uses: ./.github/actions/lean-setup
-
-      - name: Format check
-        run: npm run format:check
 
       # The runner's tests parse with the pinned lemma release.
       - name: Lean tests
@@ -258,6 +332,8 @@ jobs:
 
   test262-slice:
     name: test262 slice ${{ matrix.shard }}/3
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -327,6 +403,8 @@ jobs:
 
   runner-e2e:
     name: Runner and exe end to end
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -352,6 +430,8 @@ jobs:
 
   verdict-channel:
     name: Verdict channel ${{ matrix.shard }}/3
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -372,6 +452,8 @@ jobs:
 
   envelopes:
     name: Envelope expectations ${{ matrix.shard }}/3
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -393,6 +475,8 @@ jobs:
 
   prove-e2e:
     name: Prove end to end
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -411,6 +495,8 @@ jobs:
 
   verdict-corpus:
     name: Verdict corpus ${{ matrix.shard }}/3
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -479,6 +565,8 @@ jobs:
     if: always() && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
     needs:
       [
+        changes,
+        format,
         lean-tests,
         test262-slice,
         runner-e2e,
@@ -522,12 +610,20 @@ jobs:
             --check test262/expected.json
 
       # `needs` alone does not fail this job when a dependency failed, was
-      # cancelled, or was skipped.
-      - name: Assert every job succeeded
+      # cancelled, or was skipped. `changes` and `format` must succeed; the
+      # heavy jobs must all succeed when `changes` chose to run them, and
+      # all be skipped when it did not, so a broken `if:` cannot pass.
+      - name: Assert every job ran as chosen
         env:
           NEEDS: ${{ toJSON(needs) }}
+          RUN: ${{ needs.changes.outputs.run }}
         run: |
-          bad=$(printf '%s' "$NEEDS" | jq -r 'to_entries[] | select(.value.result != "success") | "\(.key): \(.value.result)"')
+          if [ "$RUN" = true ]; then heavy=success; else heavy=skipped; fi
+          bad=$(printf '%s' "$NEEDS" | jq -r --arg heavy "$heavy" '
+            to_entries[]
+            | (if .key == "changes" or .key == "format" then "success" else $heavy end) as $want
+            | select(.value.result != $want)
+            | "\(.key): \(.value.result), expected \($want)"')
           if [ -n "$bad" ]; then echo "$bad"; exit 1; fi
 
   # The second tier: the whole of `language`, `built-ins`, and `intl402`,
