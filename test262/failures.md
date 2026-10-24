@@ -44,7 +44,7 @@ The four classes:
   of ECMA-262 marks Normative Optional (20.1.3.8 and 20.1.3.9). Those
   directories have no row here, as `intl402` has none. A test elsewhere
   that reaches for one of the accessors as a probe is an out-of-scope
-  row owned by #100. `{ __proto__: x }` in an object literal is *not*
+  row owned by #100. `{ __proto__: x }` in an object literal is _not_
   Annex B — it is core (13.2.5.6), and the evaluator implements it —
   whatever the `B.3.1` anchors on its older tests say.
 - **bug** — a real defect, filed as its own issue. `owner` is that issue.
