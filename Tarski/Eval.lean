@@ -22,8 +22,8 @@ does, and `simp` unfolds all three under a binder it has not resolved,
 forever. So the loop arms — `evalWhile`, `evalDoWhile`, `evalFor`, and
 `evalForOf` — and the list walks — `joinElements`, `listFromArrayLike`,
 `forInNext`, the step from one object of a `for`-`in` to its prototype,
-and the four walks that run until an iterator says stop (`iteratorToList`,
-`fromEntriesInto`, `groupByInto`) — never join a simp set at all and are
+and the five walks that run until an iterator says stop (`iteratorToList`,
+`fromEntriesInto`, `groupByInto`, `fromIterable`) — never join a simp set at all and are
 unfolded one step at a time with `rw`, as are the three steps a bound
 function's target is reached by — `callBound`, `constructBound`, and
 `instanceOfBound`. `getFromUp`, `findPropertyUp`,
@@ -5215,6 +5215,28 @@ def fromArrayLike (src out : Ref) (i len : Nat) (mapper : Option (Value × Value
     fromArrayLike src out (i + 1) len mapper
   partial_fixpoint
 
+/-- `Array.from`'s loop over an iterable (23.1.2.1 step 4.d), answering
+the count of elements written, which is the `length` the caller sets.
+A throw from the mapper or from the definition closes the iterator (steps
+4.d.iv and 4.d.vi's IfAbruptCloseIterator); a throw from the step itself
+propagates with no close, the iterator having thrown for itself. Recurses
+until a heap value says stop, so it is `rw`'s and never a simp set's. -/
+def fromIterable (ir : IteratorRecord) (out : Ref) (k : Nat) (mapper : Option (Value × Value)) :
+    EvalM Nat := do
+  match ← iteratorStep ir with
+  | none => pure k
+  | some raw =>
+    match ← attempt (do
+      let v ← match mapper with
+        | none => pure raw
+        | some ft => callFunction ft.1 ft.2 [raw, Value.ofNat k]
+      createDataPropertyOrThrow out (Nat.repr k) v) with
+    | .ok () => fromIterable ir out (k + 1) mapper
+    | .error c => do
+      iteratorClose ir (some c)
+      throwCompletion c
+  partial_fixpoint
+
 /-- `findLast` and `findLastIndex` (23.1.3.11, .12): `find`'s walk
 counting down, every index visited and a hole read as `undefined` as
 there. `i` is **one past** the index to look at, as `lastIndexOfFrom`'s
@@ -5659,22 +5681,51 @@ def callArrayNative (f : NativeFn) (thisArg : Value) (args : List Value) : EvalM
       copyThrough o out (k + 1) (k + 1) (len - k - 1)
       pure a
   | .arrayFrom => do
-    -- 23.1.2.1 without step 5's `@@iterator` read (#394): an iterable is
-    -- read by index here like any other array-like. A constructor `this`
-    -- builds the result, which is what `Array.from.call(A, …)` observes.
+    -- 23.1.2.1. A constructor `this` builds the result, which is what
+    -- `Array.from.call(A, …)` observes: with no arguments on the
+    -- iterable path (step 4.a) and with the length on the array-like one
+    -- (step 5.e).
     let mapper : Option (Value × Value) ← match args[1]?.getD undefValue with
       | .prim .undef => pure none
       | v => do
         requireCallable v
         pure (some (v, args[2]?.getD undefValue))
-    let src ← toObjectValue (args.headD undefValue)
-    let len ← lengthOfArrayLike src
-    let ctor ← isConstructor thisArg
-    let a ← if ctor then construct thisArg thisArg [Value.ofNat len] else arrayCreate len
-    let out ← toObjectValue a
-    fromArrayLike src out 0 len mapper
-    setProp a "length" (Value.ofNat len)
-    pure a
+    let items := args.headD undefValue
+    -- Step 3, GetMethod(items, @@iterator): a nullish member is the
+    -- array-like path, a callable one the iterable path, and anything
+    -- else the refusal GetIterator makes. A nullish `items` reads no
+    -- member — step 5's ToObject is what refuses it, and with its own
+    -- message.
+    let usingIterator : Option Value ← match args.headD undefValue with
+      | .prim .undef | .prim .null => pure none
+      | v => do
+        match ← getProp v WellKnownSymbol.iterator.key with
+        | .prim .undef | .prim .null => pure none
+        | m => do
+          if ← isCallable m then pure (some m)
+          else throwJsError .typeError s!"{formatValue v} is not iterable"
+    match usingIterator with
+    | some m => do
+      let ctor ← isConstructor thisArg
+      let a ← if ctor then construct thisArg thisArg [] else arrayCreate 0
+      let out ← toObjectValue a
+      -- GetIteratorFromMethod (7.4.2), `next` read once as `getIterator`
+      -- reads it.
+      let ir : IteratorRecord ← match ← callFunction m items [] with
+        | .obj r => do pure { iterator := .obj r, next := ← getProp (.obj r) "next" }
+        | _ => throwJsError .typeError "Result of the Symbol.iterator method is not an object"
+      let len ← fromIterable ir out 0 mapper
+      setProp a "length" (Value.ofNat len)
+      pure a
+    | none => do
+      let src ← toObjectValue items
+      let len ← lengthOfArrayLike src
+      let ctor ← isConstructor thisArg
+      let a ← if ctor then construct thisArg thisArg [Value.ofNat len] else arrayCreate len
+      let out ← toObjectValue a
+      fromArrayLike src out 0 len mapper
+      setProp a "length" (Value.ofNat len)
+      pure a
   | .arrayOf => do
     -- 23.1.2.3, the same allocation over the argument list: `Array.of(7)`
     -- is one element where `Array(7)` is seven holes.

@@ -390,13 +390,84 @@ comparator is checked **before** ToObject, which is 23.1.3.30 step 1. -/
 
 Both allocate through the `this` they were called on when it is a
 constructor and through ArrayCreate when it is not, which is what
-`Array.from.call(A, …)` observes. `Array.from` reads an array-like by
-index: the iterable path is #394's. -/
+`Array.from.call(A, …)` observes. `Array.from` takes the iterable path
+when GetMethod(items, @@iterator) answers a method (23.1.2.1 step 3) and
+reads an array-like by index otherwise. -/
 
 #guard outcome
     (expr (callOn (.call (.member (.ident "Array") "from")
       [.objectLit [.init "length" (.numLit 2.0)], fn2 "_" "i" (.ident "i")]) "join" []))
   == "0,1"
+
+/-- `Symbol.iterator` as a computed key. -/
+private def iterKey : PropKey := .computed (.member (.ident "Symbol") "iterator")
+
+/-- The issue's iterable, with a close counter: `{ [Symbol.iterator]() {
+let i = 0; return { next: () => ({ value: i, done: i++ >= 3 }), return()
+{ closed = closed + 1; return {}; } }; } }`. -/
+private def counter : Expr :=
+  .objectLit
+    [ .method .method iterKey []
+        [ .varDecl .«let» [{ target := "i", init := some (.numLit 0.0) }],
+          .returnStmt (some (.objectLit
+            [ .init "next" (.arrow [] (.expr (.objectLit
+                [ .init "value" (.ident "i"),
+                  .init "done" (.binary .ge (.update .inc false (.ident "i")) (.numLit 3.0)) ]))),
+              .method .method "return" []
+                [ .exprStmt (.compoundAssign .add (.ident "closed") (.numLit 1.0)),
+                  .returnStmt (some (.objectLit [])) ] ])) ] ]
+
+/-- `let closed = 0; const it = <counter>;` -/
+private def withCounter : List Stmt :=
+  [ .varDecl .«let» [{ target := "closed", init := some (.numLit 0.0) }],
+    .varDecl .«const» [{ target := "it", init := some counter }] ]
+
+-- The iterable path (#66): an iterable that is not array-like is walked
+-- through its iterator, and the mapper sees each value with its index.
+#guard outcome
+    (withCounter ++ [.exprStmt (.member (.call (.member (.ident "Array") "from") [.ident "it"]) "length")])
+  == "3"
+#guard outcome
+    (withCounter ++
+      [.exprStmt (callOn (.call (.member (.ident "Array") "from")
+        [.ident "it", fn2 "v" "i" (.binary .add (.binary .mul (.ident "v") (.numLit 10.0)) (.ident "i"))])
+        "join" [])])
+  == "0,11,22"
+-- A mapper that throws closes the iterator (step 4.d.iv's
+-- IfAbruptCloseIterator); an exhausted iterator is not closed.
+#guard outcome
+    (withCounter ++
+      [ .tryStmt
+          [.exprStmt (.call (.member (.ident "Array") "from")
+            [.ident "it", fn1 "v" (.call (.ident "fail") [])])]
+          (some { param := none, body := [] }) none,
+        .exprStmt (.ident "closed") ])
+  == "1"
+#guard outcome
+    (withCounter ++
+      [ .exprStmt (.call (.member (.ident "Array") "from") [.ident "it"]),
+        .exprStmt (.ident "closed") ])
+  == "0"
+-- On the iterable path the constructor is called with no arguments
+-- (step 4.a), so `Array.from.call(Object, [])` is a plain object and not
+-- a `Number` wrapper around 0.
+#guard outcome
+    (expr (.binary .strictEq
+      (.member (.call (.member (.member (.ident "Array") "from") "call") [.ident "Object", .arrayLit []])
+        "constructor")
+      (.ident "Object")))
+  == "true"
+-- GetMethod: a nullish `@@iterator` means the array-like path, and a
+-- non-callable one is a TypeError before anything is read by index.
+#guard outcome
+    (expr (callOn (.call (.member (.ident "Array") "from")
+      [.objectLit [.init "length" (.numLit 1.0), .init "0" (.numLit 7.0), .init iterKey .nullLit]])
+      "join" []))
+  == "7"
+#guard outcome
+    (expr (.call (.member (.ident "Array") "from")
+      [.objectLit [.init "length" (.numLit 1.0), .init iterKey (.numLit 1.0)]]))
+  == "uncaught: TypeError: [object Object] is not iterable"
 -- There is no HasProperty in 23.1.2.1's loop, so a hole arrives as
 -- `undefined` rather than staying one.
 #guard outcome
@@ -411,13 +482,15 @@ index: the iterable path is #394's. -/
 #guard outcome
     (expr (.call (.member (.ident "Array") "from") [.undefLit]))
   == "uncaught: TypeError: Cannot convert undefined or null to object"
--- A string is read as the array-like it is boxed into (#391's wrapper).
--- 23.1.2.1 step 5 would take a string by its `@@iterator` instead
--- (#394); for a string with no surrogate pair the two agree, and this is
--- the answer either way.
+-- A string has an `@@iterator`, so it is walked by code point and not
+-- read by code unit as the array-like it is boxed into would be: a
+-- surrogate pair is one element.
 #guard outcome
     (expr (.call (.member (.call (.member (.ident "Array") "from") [.strLit "ab"]) "join") []))
   == "a,b"
+#guard outcome
+    (expr (.member (.call (.member (.ident "Array") "from") [.strLit "😀"]) "length"))
+  == "1"
 -- A constructor `this` builds the result.
 #guard outcome
     [ declareA,

@@ -53,9 +53,9 @@ none is here. `rawSegments`, `String.raw`'s walk, is one of them, and the
 `mergeValues`, and `fromArrayLike`, each recursing on a length or a list
 the heap named. `callStringNative`, the `String` surface, and
 `callArrayNative`, the `Array` one, are out for `callReflectNative`'s
-reason rather than for a loop's. So are the four walks that run until an
+reason rather than for a loop's. So are the five walks that run until an
 *iterator* says stop: `evalForOf`, `iteratorToList`, `fromEntriesInto`,
-and `groupByInto`. -/
+`groupByInto`, and `fromIterable`. -/
 
 namespace Tarski
 

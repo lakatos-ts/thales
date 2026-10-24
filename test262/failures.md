@@ -75,13 +75,12 @@ wrong amount, or a species allocation building the wrong thing** — the
 rows that waited on #390 are gone.
 
 Nothing waits on #394 either: `for`-`of`, spread, destructuring, and the
-three iterators answer correctly. Two seams the merge of #390 and #394
-left are filed rather than classified under a closed issue — #531,
-`Array.from` never asking for `@@iterator`, and #532,
+three iterators answer correctly. One seam the merge of #390 and #394
+left is filed rather than classified under a closed issue — #532,
 `%IteratorPrototype%` carrying no `@@toStringTag` — and #533 is the
 destructuring evaluation order the two order tests see.
 
-The 1,391 failures below, by owner: 1,024 what #376 excludes (`eval`,
+The 1,377 failures below, by owner: 1,024 what #376 excludes (`eval`,
 `Date`, `RegExp`, `Proxy`, `Reflect`, typed arrays, the keyed
 collections, explicit resource management, the `Iterator` constructor and
 its helpers, `Error.prototype.stack`, `JSON.rawJSON` and the reviver's
@@ -90,13 +89,21 @@ source text, `Array.fromAsync`, the `Function` constructor's semantics,
 expression, and the `nonextensible-applies-to-private` proposal), 4 the
 legacy `Object.prototype` accessors, which are Annex B (#100), 137 the
 global object (#487), 151 the transcendental `Math`
-members (#434), 16 the Unicode character database (#518), 14
-`Array.from` over an iterable (#531), 10
+members (#434), 16 the Unicode character database (#518), 10
 the `@@split`, `@@replace`, and `@@match` lookups the `String` methods
 skip (#523), 5 `Array.prototype[@@unscopables]` (#524), 5 `Math.random`
 (#445), 2 `%IteratorPrototype%`'s `@@toStringTag` (#532), and 23 the ten
 filed defects (#436, #460, #476, #496, #499, #512, #516, #520, #522, and
 #533).
+
+**`Array.from` taking the iterable path moved 14 tests from fail to
+pass** (#66 in this repository, #531 before it) in its own directory and
+nowhere else: the `iter-*` tests and `get-iter-method-err.js` are the
+GetMethod step and the walk it routes to, and
+`source-object-constructor.js` is the constructor called with no
+arguments on that path, so `Array.from.call(Object, [])` is a plain
+object. The three failures left are the two top-level `this` tests
+(#487) and `ArrayBuffer` (#376).
 
 **`Math.clz32` and `Math.imul` moved 15 tests from fail to pass** (#16
 in this repository, #440 before it) in their own two directories and
@@ -217,14 +224,13 @@ nothing else — and the four `Array.prototype` iterator members 28 and 0.
 String iterator cleared `String/prototype/Symbol.iterator` to 6 pass and
 0 fail.
 
-**The forty-eight `Array` directories #390 added are 2,718 pass and 132
+**The forty-eight `Array` directories #390 added are 2,732 pass and 118
 fail**, with 108 unsupported and 124 not run — 88 `async`
 `Array.fromAsync` tests and 36 `noStrict` ones, neither of which this
-epic runs. Not one of the 132 is a member of `Array.prototype` answering
+epic runs. Not one of the 118 is a member of `Array.prototype` answering
 the wrong thing: 101 are what #376 excludes, `Proxy`, `Date`,
 regular expressions, typed arrays, `isConstructor.js`, `eval`,
-`Array.fromAsync`, and `Reflect` among them; 14 are `Array.from` never asking for
-`@@iterator` (#531); 7 are the global object (#487); 5 are
+`Array.fromAsync`, and `Reflect` among them; 7 are the global object (#487); 5 are
 `Array.prototype[@@unscopables]` (#524); 2 are ArraySetLength's double
 coercion (#520); 2 are the
 `Infinity` literal (#460); and 1 is a transcendental `Math` member
@@ -294,7 +300,6 @@ never needed a global object; they are Normative Optional (20.1.3.8 and
 | `test/built-ins/AggregateError`                                       | 1     | builtin      | there is no global object                                                                                           | #487  |
 | `test/built-ins/Array`                                                | 1     | builtin      | there is no global object, so a top-level `this` is `undefined`                                                     | #487  |
 | `test/built-ins/Array`                                                | 1     | out-of-scope | `isConstructor.js` needs `Reflect.construct`                                                                        | #376  |
-| `test/built-ins/Array/from`                                           | 14    | builtin      | `Array.from` reads an array-like by index and does not take the iterable path                                       | #531  |
 | `test/built-ins/Array/from`                                           | 2     | builtin      | there is no global object, so a top-level `this` is `undefined`                                                     | #487  |
 | `test/built-ins/Array/from`                                           | 1     | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
 | `test/built-ins/Array/fromAsync`                                      | 4     | out-of-scope | `Array.fromAsync` is async and outside the epic                                                                     | #376  |
