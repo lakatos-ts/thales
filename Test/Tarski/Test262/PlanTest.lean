@@ -41,6 +41,19 @@ def offset (hay needle : String) : Option Nat :=
 
 -- skips
 #eval do expect "intl402 by path" ((← planned "test/intl402/x.js") == some (Plan.skip .intl402))
+#eval do expect "Annex B by path" ((← planned "test/annexB/x.js") == some (Plan.skip .annexB))
+-- The annex's own tree, and the Normative Optional accessors in the main
+-- tree; a sibling directory under `Object/prototype` is not one.
+#guard isAnnexB "test/annexB/built-ins/escape/length.js"
+#guard isAnnexB "test/annexB/language/comments/single-line-html-close.js"
+#guard isAnnexB "test/built-ins/Object/prototype/__proto__/set-cycle.js"
+#guard isAnnexB "test/built-ins/Object/prototype/__defineGetter__/define-abrupt.js"
+#guard isAnnexB "test/built-ins/Object/prototype/__defineSetter__/define-abrupt.js"
+#guard isAnnexB "test/built-ins/Object/prototype/__lookupGetter__/lookup-own-get.js"
+#guard isAnnexB "test/built-ins/Object/prototype/__lookupSetter__/lookup-own-set.js"
+#guard !isAnnexB "test/built-ins/Object/prototype/toString/symbol-tag.js"
+#guard !isAnnexB "test/built-ins/Object/prototype/setPrototypeOf-with-non-circular-values-__proto__.js"
+#guard !isAnnexB "test/language/expressions/object/__proto__-value-null.js"
 #eval do expect "a parse-phase negative" ((← planned "test/skipped/parse-negative.js") == some (Plan.skip .parseNegative))
 #eval do expect "a resolution-phase negative" ((← planned "test/skipped/resolution-negative.js") == some (Plan.skip .resolutionNegative))
 -- The resolution negative is also flagged `module`; the phase is read first.

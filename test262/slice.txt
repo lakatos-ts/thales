@@ -6,6 +6,12 @@
 # One path per line, relative to the test262 checkout. A line starting
 # with `#` is a comment and a blank line is skipped; everything else is a
 # directory or a file the runner walks, in the order written.
+#
+# Annex B is out of scope: the runner skips `test/annexB/` and the five
+# legacy `Object.prototype` accessor directories under `test/built-ins/
+# Object/prototype` wherever a slice reaches them (`annexBPaths` in
+# `Tarski/Test262/Plan.lean`), as it skips `test/intl402/`. The
+# `failures.md` scope note says why.
 
 # The harness itself. It is assembled into every other test, so its own
 # row is the first thing a refusal shows up in.

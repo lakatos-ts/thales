@@ -1,8 +1,8 @@
-/-! test262's YAML front matter, the four keys the runner reads.
+/-! test262's YAML front matter, the three keys the runner reads.
 
 The block is `/*---` … `---*/`. Nothing here is a YAML parser: the suite's
 front matter is a small regular subset — top-level keys at column 0, lists
-flow (`[a.js, b.js]`) or block (`  - Symbol`), `negative` a two-key map,
+flow (`[a.js, b.js]`) or block (`  - a.js`), `negative` a two-key map,
 and `info`/`description` block scalars skipped whole by indentation, so a
 block scalar can say anything, including something that looks like a key.
 
@@ -17,12 +17,13 @@ structure Negative where
   type : String
 deriving Repr, BEq, Inhabited
 
-/-- The four front-matter keys that decide how a test is run. Absent and
-empty mean the same thing to every decision the runner makes. -/
+/-- The three front-matter keys that decide how a test is run. Absent and
+empty mean the same thing to every decision the runner makes. `features`
+is not read: what the runner leaves out, it leaves out by path
+(`Tarski/Test262/Plan.lean`). -/
 structure FrontMatter where
   includes : Array String := #[]
   flags : Array String := #[]
-  features : Array String := #[]
   negative : Option Negative := none
 deriving Repr, BEq, Inhabited
 
@@ -131,7 +132,6 @@ def parseFrontMatter (source : String) : FrontMatter := Id.run do
     let list := if value.isEmpty then blockList lines index else flowList value
     if name == "includes" then front := { front with includes := list }
     else if name == "flags" then front := { front with flags := list }
-    else if name == "features" then front := { front with features := list }
     else if name == "negative" then
       if let some n := negativeMap lines index then front := { front with negative := some n }
   return front

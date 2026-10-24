@@ -255,9 +255,10 @@ and `.toUpperCase` too — and the escape is cheaper than a constructor
 whose name is not the method's.
 
 The regex-taking members (`match`, `matchAll`, `search`), the iterator,
-and Annex B's methods are not here: a `RegExp` is outside #376, the
-iterator is #394's, and Annex B is not in this slice's test262
-directory. -/
+and Annex B's methods (`substr`, the HTML methods, `trimLeft`,
+`trimRight`) are not here: a `RegExp` is outside #376, the iterator is
+#394's, and Annex B is out of scope (#100; `Tarski/Test262/Plan.lean`
+skips its tests). -/
 inductive StringFn where
   /-- `String.fromCharCode`. -/
   | fromCharCode

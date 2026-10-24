@@ -10,7 +10,8 @@ file's `includes` in order, then the test, all one script with
 Strict mode only, so `noStrict` is not run, and neither is a `raw` test
 whose text does not start strict; `async` needs the job queue and `module`
 needs modules. Parse- and resolution-phase negatives are not scored (the
-parser is TypeScript's), and neither is `intl402`. -/
+parser is TypeScript's), and neither is `intl402` nor Annex B
+(`annexBPaths`). -/
 
 namespace Tarski.Test262
 
@@ -31,15 +32,36 @@ def NotRunReason.name : NotRunReason → String
 
 /-- Why a test is outside the table entirely. -/
 inductive SkipReason where
-  | intl402 | parseNegative | resolutionNegative
+  | intl402 | parseNegative | resolutionNegative | annexB
 deriving Repr, BEq, Inhabited
 
 /-- Every skip reason, in the order the rows are written. -/
-def SkipReason.all : Array SkipReason := #[.parseNegative, .resolutionNegative, .intl402]
+def SkipReason.all : Array SkipReason := #[.parseNegative, .resolutionNegative, .intl402, .annexB]
 
 def SkipReason.name : SkipReason → String
   | .intl402 => "intl402" | .parseNegative => "parse-negative"
-  | .resolutionNegative => "resolution-negative"
+  | .resolutionNegative => "resolution-negative" | .annexB => "annex-b"
+
+/-- Where test262 tests Annex B, which tarski does not implement: the annex
+is normative but optional when the host is not a web browser (its
+preamble), and tarski is not one. `test/annexB/` is the annex's own tree.
+The five directories are the legacy `Object.prototype` accessors, which
+the main body of ECMA-262 carries as Normative Optional clauses (20.1.3.8
+`Object.prototype.__proto__` and 20.1.3.9 the four `__defineGetter__`
+accessors); at the pin they are the only Annex B tests outside the tree.
+A path rule rather than the `features` tag: the `__proto__` tag also marks
+`{ __proto__: x }` in an object literal, which is core (13.2.5.6). -/
+def annexBPaths : Array String := #[
+  "test/annexB/",
+  "test/built-ins/Object/prototype/__proto__/",
+  "test/built-ins/Object/prototype/__defineGetter__/",
+  "test/built-ins/Object/prototype/__defineSetter__/",
+  "test/built-ins/Object/prototype/__lookupGetter__/",
+  "test/built-ins/Object/prototype/__lookupSetter__/"]
+
+/-- Whether `relPath` (relative to the test262 root, `/`-separated) is under
+one of `annexBPaths`. -/
+def isAnnexB (relPath : String) : Bool := annexBPaths.any fun path => relPath.startsWith path
 
 /-- What the runner does with one test. `negative` is a runtime-phase
 negative's class. -/
@@ -87,6 +109,7 @@ def planTest (relPath source : String) (readHarness : String → IO (Option Stri
     IO (Except String Plan) := do
   -- A test can be several of these at once; the first explains it best.
   if relPath.startsWith "test/intl402/" then return .ok (.skip .intl402)
+  if isAnnexB relPath then return .ok (.skip .annexB)
   let front := parseFrontMatter source
   let negative := front.negative.map (·.type)
   match front.negative with
