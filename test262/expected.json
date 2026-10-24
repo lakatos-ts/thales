@@ -3208,10 +3208,10 @@
   "test/built-ins/Array/from":
   {"unsupported": 4,
    "timeout": 0,
-   "pass": 24,
+   "pass": 38,
    "notRun": {"raw": 0, "noStrict": 2, "module": 0, "budget": 0, "async": 0},
    "harnessError": 0,
-   "fail": 17},
+   "fail": 3},
   "test/built-ins/Array/Symbol.species":
   {"unsupported": 0,
    "timeout": 0,

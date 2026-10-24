@@ -87,11 +87,11 @@ private def simprocIn (n : Name) : CoreM Bool := do
   ``Tarski.construct, ``Tarski.listFromArrayLike, ``Tarski.forInNext, ``Tarski.rawSegments,
   ``Tarski.callBound, ``Tarski.constructBound, ``Tarski.instanceOfBound,
   ``Tarski.callReflectNative, ``Tarski.callStringNative,
-  -- The four walks that run until an *iterator* says stop are loops by
+  -- The five walks that run until an *iterator* says stop are loops by
   -- the same rule, and `Test/Tarski/ForOfUnfoldTest.lean` is where
   -- `evalForOf` is unfolded a step at a time.
   ``Tarski.evalForOf, ``Tarski.iteratorToList, ``Tarski.fromEntriesInto,
-  ``Tarski.groupByInto].anyM unfoldsIn)
+  ``Tarski.groupByInto, ``Tarski.fromIterable].anyM unfoldsIn)
 
 -- The `Array` surface's own walks, and the dispatcher over them. Each
 -- recurses on a length or a list the heap named, which is a loop by
