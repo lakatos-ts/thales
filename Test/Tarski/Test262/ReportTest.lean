@@ -111,7 +111,8 @@ def summaryOf (results : Array Result) (commit : Option String) : Summary :=
 #guard (summaryOf sample (some COMMIT)).totals ==
   { pass := 1, fail := 1, unsupported := 3, timeout := 1, harnessError := 1, notRun := { async := 1, budget := 1 } }
 -- summarize: every skip reason, zeros included, and the histogram in order
-#guard (summaryOf sample (some COMMIT)).skipped == #[(.parseNegative, 1), (.resolutionNegative, 0), (.intl402, 1)]
+#guard (summaryOf sample (some COMMIT)).skipped ==
+  #[(.parseNegative, 1), (.resolutionNegative, 0), (.intl402, 1), (.annexB, 0)]
 #guard (summaryOf sample (some COMMIT)).unsupported == #[("SwitchStatement", 2), ("ForStatement", 1)]
 -- summarize: a null commit passes through
 #guard (summaryOf sample none).commit == none
@@ -142,6 +143,7 @@ def summaryOf (results : Array Result) (commit : Option String) : Summary :=
   "| parse-negative      |     1 | outside the table |",
   "| resolution-negative |     0 | outside the table |",
   "| intl402             |     1 | outside the table |",
+  "| annex-b             |     0 | outside the table |",
   "",
   "## Unsupported",
   "",

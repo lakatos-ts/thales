@@ -154,10 +154,9 @@ hooks — `evalScript`, `createRealm`, `detachArrayBuffer`, `gc`, `agent`,
 than failed; the object itself exists, empty, so that `typeof $262` is
 `"object"` and `$262.IsHTMLDDA` reads `undefined`, which is what the
 suite asks of a host that does not provide it. There is still no global
-*object*: `globalThis`, a top-level `this`, `$262.global`, and
-`Object.prototype.__proto__` are #487's, because a global object whose
-properties *are* these cells is a change to `Env` and `hoistVars` that no
-part of the intrinsics' surface needs.
+*object*: `globalThis`, a top-level `this`, and `$262.global` are #487's,
+because a global object whose properties *are* these cells is a change to
+`Env` and `hoistVars` that no part of the intrinsics' surface needs.
 
 `console` is not test262's; it is `tarski <file.ts>`'s, the binding an
 ordinary program writes its output through. Its `log` appends to the
@@ -165,12 +164,14 @@ ordinary program writes its output through. Its `log` appends to the
 program order however the two were mixed, and it holds no other member:
 `console.error`, `console.warn`, and the rest are outside #386.
 
-`Object.prototype` carries its whole surface but the two accessors:
-`toString`, `valueOf`, `toLocaleString`, `isPrototypeOf`,
-`propertyIsEnumerable`, and `hasOwnProperty`, so `{} + 1` is
-`"[object Object]1"`. `__proto__` is #487's; `Object.prototype` has no
-`@@toStringTag` of its own — the tag is `Object.prototype.toString`'s
-own read of one. Object literals, function `prototype` objects,
+`Object.prototype` carries its whole required surface: `toString`,
+`valueOf`, `toLocaleString`, `isPrototypeOf`, `propertyIsEnumerable`,
+and `hasOwnProperty`, so `{} + 1` is `"[object Object]1"`. The
+`__proto__` accessor and the four `__defineGetter__` accessors are
+Normative Optional (20.1.3.8, 20.1.3.9): Annex B, which is out of scope
+(#100), so they are not here and test262's directories for them are
+skipped. `Object.prototype` has no `@@toStringTag` of its own — the tag
+is `Object.prototype.toString`'s own read of one. Object literals, function `prototype` objects,
 `Error.prototype`, and `Array.prototype` all link to it, and
 `Object.prototype` itself is null-prototyped.
 
@@ -1067,8 +1068,8 @@ def Heap.initial : Heap where
        -- 14: Error.prototype.toString
        Obj.builtin .errorToString "toString" 0,
        -- 15: Object.prototype. The root of every ordinary chain, and
-       -- itself null-prototyped. `__proto__` is #487's; the rest of
-       -- 20.1.3 is here.
+       -- itself null-prototyped. All of 20.1.3 but its two Normative
+       -- Optional clauses, the Annex B accessors (#100), is here.
        { proto := none,
          properties :=
            [ ("constructor", Property.method (.obj 16)),

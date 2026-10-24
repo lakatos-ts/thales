@@ -62,7 +62,7 @@ def TABLE : String := "\n".intercalate [
   expect "status 0" (r.status == 0)
   expect "the table" (r.stdout.startsWith TABLE)
   expect "not-run reasons" (has r.stdout "not run:\n  async  1\n  module  1\n  noStrict  1\n  raw  1")
-  expect "skip reasons" (has r.stdout "skipped:\n  intl402  1\n  parse-negative  1\n  resolution-negative  1")
+  expect "skip reasons" (has r.stdout "skipped:\n  annex-b  1\n  intl402  1\n  parse-negative  1\n  resolution-negative  1")
   expect "unsupported kinds" (has r.stdout "unsupported:\n  FunctionDeclaration generator  2\n  $262.evalScript  1")
   expect "a failure" (has r.stdout "test/fail/assert-fails.js  Uncaught Test262Error: boom")
   expect "a wrong class" (has r.stdout "test/fail/negative-wrong-class.js  expected an uncaught TypeError, got Uncaught RangeError: r")
@@ -99,8 +99,9 @@ def TABLE : String := "\n".intercalate [
   expect "counts" (has r.stdout "not run:" && has r.stdout "skipped:" && has r.stdout "unsupported:")
   expect "no lists" (!has r.stdout "failures:" && !has r.stdout "harness errors:" && !has r.stdout "timeouts:")
   expect "progress" (r.stderr == "\n".intercalate [
-    "  4/23  test/fail", "  6/23  test/harness-error", "  7/23  test/intl402", "  11/23  test/not-run",
-    "  17/23  test/pass", "  19/23  test/skipped", "  20/23  test/timeout", "  23/23  test/unsupported"])
+    "  1/24  test/annexB", "  5/24  test/fail", "  7/24  test/harness-error", "  8/24  test/intl402",
+    "  12/24  test/not-run", "  18/24  test/pass", "  20/24  test/skipped", "  21/24  test/timeout",
+    "  24/24  test/unsupported"])
 
 -- --budget 0: every planned run is `budget` and nothing is spawned; the
 -- timeout row's zero is the witness, its test diverging if spawned.

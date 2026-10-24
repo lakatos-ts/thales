@@ -35,7 +35,18 @@ The four classes:
   decoder cannot see, so it reaches evaluation and answers wrongly rather
   than refusing.
 - **out-of-scope** — what #376 excludes: `eval`, the `Function`
-  constructor, generators, typed arrays, `Date`, and the rest.
+  constructor, generators, typed arrays, `Date`, and the rest — and
+  Annex B, which #100 excludes. The annex is normative but optional when
+  the host is not a web browser, and tarski is not one. The runner skips
+  its tests by path (`annexBPaths` in `Tarski/Test262/Plan.lean`):
+  `test/annexB/`, which no slice lists, and the five legacy
+  `Object.prototype` accessor directories, whose clauses the main body
+  of ECMA-262 marks Normative Optional (20.1.3.8 and 20.1.3.9). Those
+  directories have no row here, as `intl402` has none. A test elsewhere
+  that reaches for one of the accessors as a probe is an out-of-scope
+  row owned by #100. `{ __proto__: x }` in an object literal is *not*
+  Annex B — it is core (13.2.5.6), and the evaluator implements it —
+  whatever the `B.3.1` anchors on its older tests say.
 - **bug** — a real defect, filed as its own issue. `owner` is that issue.
 
 `owner` is the issue the row waits on. Nothing here waits on #383, on
@@ -70,13 +81,14 @@ left are filed rather than classified under a closed issue — #531,
 `%IteratorPrototype%` carrying no `@@toStringTag` — and #533 is the
 destructuring evaluation order the two order tests see.
 
-The 1,456 failures below, by owner: 1,033 what #376 excludes (`eval`,
+The 1,391 failures below, by owner: 1,024 what #376 excludes (`eval`,
 `Date`, `RegExp`, `Proxy`, `Reflect`, typed arrays, the keyed
 collections, explicit resource management, the `Iterator` constructor and
 its helpers, `Error.prototype.stack`, `JSON.rawJSON` and the reviver's
 source text, `Array.fromAsync`, the `Function` constructor's semantics,
 `nativeFunctionMatcher.js`, which matches source text with a regular
-expression, and the `nonextensible-applies-to-private` proposal), 197 the
+expression, and the `nonextensible-applies-to-private` proposal), 4 the
+legacy `Object.prototype` accessors, which are Annex B (#100), 137 the
 global object (#487), 151 the transcendental `Math`
 members (#434), 16 the Unicode character database (#518), 14
 `Array.from` over an iterable (#531), 10
@@ -261,6 +273,17 @@ answering the wrong thing.**
 unsupported.** Not one failure is the brand check or `delete`: 2 are
 `RegExp`, 1 `eval`, and 1 a top-level `this` with no global object
 (#487).
+
+**Annex B left the table** (#100). The runner now skips the five legacy
+`Object.prototype` accessor directories by path, as it skips `intl402`,
+so their 69 failures — 57 the accessors' absence, filed until now under
+the global object, and 12 `Proxy` and `Reflect` — are outside the table
+rather than rows in it, and the four `class/elements` tests that call
+`__lookupGetter__` or `__lookupSetter__` as a probe are out-of-scope
+rows owned by #100. No test passes or fails differently: the evaluator
+did not change, and the five directories are not run. The accessors
+never needed a global object; they are Normative Optional (20.1.3.8 and
+20.1.3.9), and tarski is not a web browser.
 
 ## The table
 
@@ -486,16 +509,6 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/built-ins/Object/preventExtensions`                             | 2     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
 | `test/built-ins/Object/preventExtensions`                             | 2     | out-of-scope | regular expressions are excluded by the epic                                                                        | #376  |
 | `test/built-ins/Object/prototype`                                     | 4     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
-| `test/built-ins/Object/prototype/__defineGetter__`                    | 10    | builtin      | the Annex B accessors on `Object.prototype` come with the global object                                             | #487  |
-| `test/built-ins/Object/prototype/__defineGetter__`                    | 1     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
-| `test/built-ins/Object/prototype/__defineSetter__`                    | 10    | builtin      | the Annex B accessors on `Object.prototype` come with the global object                                             | #487  |
-| `test/built-ins/Object/prototype/__defineSetter__`                    | 1     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
-| `test/built-ins/Object/prototype/__lookupGetter__`                    | 12    | builtin      | the Annex B accessors on `Object.prototype` come with the global object                                             | #487  |
-| `test/built-ins/Object/prototype/__lookupGetter__`                    | 4     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
-| `test/built-ins/Object/prototype/__lookupSetter__`                    | 12    | builtin      | the Annex B accessors on `Object.prototype` come with the global object                                             | #487  |
-| `test/built-ins/Object/prototype/__lookupSetter__`                    | 4     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
-| `test/built-ins/Object/prototype/__proto__`                           | 13    | builtin      | the Annex B accessors on `Object.prototype` come with the global object                                             | #487  |
-| `test/built-ins/Object/prototype/__proto__`                           | 2     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
 | `test/built-ins/Object/prototype/hasOwnProperty`                      | 1     | builtin      | there is no global object                                                                                           | #487  |
 | `test/built-ins/Object/prototype/isPrototypeOf`                       | 1     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
 | `test/built-ins/Object/prototype/toString`                            | 8     | out-of-scope | `Date`, the keyed collections, promises, and BigInt are excluded by the epic                                        | #376  |
@@ -575,7 +588,7 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/language/expressions/class/elements`                            | 24    | out-of-scope | an early-error test that reaches for `eval`                                                                         | #376  |
 | `test/language/expressions/class/elements`                            | 19    | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/expressions/class/elements`                            | 4     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
-| `test/language/expressions/class/elements`                            | 2     | builtin      | the Annex B accessors on `Object.prototype` come with the global object                                             | #487  |
+| `test/language/expressions/class/elements`                            | 2     | out-of-scope | the legacy `Object.prototype` accessors are Annex B, which is out of scope                                          | #100  |
 | `test/language/expressions/class/elements/private-methods`            | 2     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
 | `test/language/expressions/class/elements/syntax/valid`               | 1     | bug          | a static method named `constructor` is emitted as the class constructor                                             | #496  |
 | `test/language/expressions/class/subclass-builtins`                   | 14    | out-of-scope | typed arrays and their buffers are excluded by the epic                                                             | #376  |
@@ -622,7 +635,7 @@ unsupported.** Not one failure is the brand check or `delete`: 2 are
 | `test/language/statements/class/elements`                             | 32    | out-of-scope | an early-error test that reaches for `eval`                                                                         | #376  |
 | `test/language/statements/class/elements`                             | 30    | out-of-scope | `eval` is excluded by the epic                                                                                      | #376  |
 | `test/language/statements/class/elements`                             | 6     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
-| `test/language/statements/class/elements`                             | 2     | builtin      | the Annex B accessors on `Object.prototype` come with the global object                                             | #487  |
+| `test/language/statements/class/elements`                             | 2     | out-of-scope | the legacy `Object.prototype` accessors are Annex B, which is out of scope                                          | #100  |
 | `test/language/statements/class/elements`                             | 1     | builtin      | there is no global object                                                                                           | #487  |
 | `test/language/statements/class/elements/private-methods`             | 2     | out-of-scope | `Proxy` and `Reflect` are excluded by the epic                                                                      | #376  |
 | `test/language/statements/class/elements/syntax/valid`                | 1     | bug          | a static method named `constructor` is emitted as the class constructor                                             | #496  |
